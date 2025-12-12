@@ -1,14 +1,45 @@
 import PropertyList from './PropertyList';
 const _url = process.env.NEXT_PUBLIC_BASE_URL;
 
+interface RawProperty {
+  ListingKey: string;
+  NewListing: boolean;
+  Data?: {
+    MlsStatus?: string;
+    StreetNumber?: string;
+    StreetName?: string;
+    StreetSuffix?: string;
+    City?: string;
+    SubdivisionName?: string;
+    PropertySubType?: string;
+    BCRES_SaleOrRent?: string;
+    ListingId?: string;
+    BathroomsTotalInteger?: number;
+    BuildingAreaTotal?: number;
+    StateOrProvince?: string;
+    ListPrice?: number;
+    BedroomsTotal?: number;
+    PropertyType?: string;
+  };
+  Media?: { MediaURL: string; MediaName: string }[];
+}
+
 async function fetchProperties(page = 1) {
-  const res = await fetch(
-    page === 1 ? `${_url}properties/` : `${_url}properties/?page=${page}`
-  );
+  const url =
+    page === 1 ? `${_url}properties/` : `${_url}properties/?page=${page}`;
 
-  const data = await res.json();
+  const res = await fetch(url, { cache: 'no-store' });
+  const text = await res.text();
 
-  return data.map((p: any) => ({
+  let data: RawProperty[];
+  try {
+    data = JSON.parse(text);
+  } catch (err) {
+    console.error('JSON Parse Error! Response is not JSON.');
+    throw err;
+  }
+
+  return data.map((p) => ({
     ListingKey: p.ListingKey,
     MlsStatus: p.Data?.MlsStatus ?? '',
     NewListing: p.NewListing,
@@ -28,19 +59,18 @@ async function fetchProperties(page = 1) {
     BedroomsTotal: p.Data?.BedroomsTotal ?? 0,
     PropertyType: p.Data?.PropertyType ?? '',
     BathroomsFull: p.Data?.BathroomsTotalInteger ?? 0,
-
     LivingArea: p.Data?.BuildingAreaTotal ?? 0,
-
     YearBuilt: null,
 
     Media:
       Array.isArray(p.Media) && p.Media.length > 0
-        ? p.Media.map((m: any, index: number) => ({
+        ? p.Media.map((m, index) => ({
             MediaURL: `${m.MediaURL}${m.MediaName}`,
             Order: index + 1,
             RealURL: `${m.MediaURL}${m.MediaName}`,
           }))
         : [{ MediaURL: '/Image/default.jpg', Order: 1 }],
+    MediaName: p.Media?.[0]?.MediaName ?? 'default.jpg',
   }));
 }
 
