@@ -4,16 +4,11 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import PropertyCards from '@/components/PropertyCards';
-import { GoogleMap } from '@react-google-maps/api';
 import PropertyMap from '@/components/PropertyMap';
 const _url = process.env.NEXT_PUBLIC_BASE_URL;
 
 interface MediaItem {
   MediaURL: string;
-}
-interface Card {
-  id: number;
-  title: string;
 }
 interface Property {
   ListingKey: string;
@@ -52,9 +47,6 @@ export default function PropertyDetail() {
   const { id } = useParams();
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showGallery, setShowGallery] = useState(false);
-  const [current, setCurrent] = useState(0);
-  const [images, setImages] = useState<string[]>([]);
   const [propertyData, setPropertyData] = useState<PropertyDetails>({
     MlsStatus: 'N/A',
     YearBuiltEffective: 'N/A',
@@ -94,12 +86,6 @@ export default function PropertyDetail() {
           Longitude: data.Data.Longitude,
         });
 
-        const imgs = (data.MediaNames || []).map(
-          (name: string) => `${data.MediaURL}${name}`
-        );
-
-        setImages(imgs);
-
         setPropertyData({
           MlsStatus: data.Data.MlsStatus || 'N/A',
           YearBuiltEffective: data.Data.YearBuilt || 'N/A',
@@ -129,8 +115,6 @@ export default function PropertyDetail() {
   if (!property)
     return <p className='text-center mt-10'>Property not found.</p>;
 
-  const photosCount = images.length;
-
   return (
     <main className='bg-[#EBEBEB] min-h-screen px-[16px] lg:px-[120px]'>
       <div className='max-w-[1200px] mx-auto rounded-lg'>
@@ -138,7 +122,13 @@ export default function PropertyDetail() {
           <div className=' '>
             <div className='flex pt-5 flex-wrap items-center gap-2 text-gray-700 text-sm'>
               <span className='bg-[#fff] flex items-center w-fit h-[32px] rounded-[4px] px-2 py-1'>
-                <img className='mr-2' src='/Image/icons/ruler.svg' alt='' />
+                <Image
+                  src='/Image/icons/ruler.svg'
+                  alt='Ruler icon'
+                  width={20}
+                  height={20}
+                  className='mr-2'
+                />
                 {property.BuildingAreaTotal
                   ? property.BuildingAreaTotal.toLocaleString()
                   : 'N/A'}{' '}
@@ -146,19 +136,23 @@ export default function PropertyDetail() {
               </span>
 
               <span className='bg-[#fff] flex items-center w-fit h-[32px] px-2 py-1 rounded-lg'>
-                <img
-                  className='mr-2'
+                <Image
                   src='/Image/icons/single-bed.svg'
-                  alt=''
+                  alt='Bed icon'
+                  width={20}
+                  height={20}
+                  className='mr-2'
                 />
                 {property.BathroomsTotalInteger ?? 'N/A'}
               </span>
 
               <span className='bg-[#fff] flex items-center w-fit h-[32px] px-2 py-1 rounded-lg'>
-                <img
-                  className='mr-2'
+                <Image
                   src='/Image/icons/shower-head.svg'
-                  alt=''
+                  alt='Shower icon'
+                  width={20}
+                  height={20}
+                  className='mr-2'
                 />
                 {property.BathroomsFull ?? 'N/A'}
               </span>
