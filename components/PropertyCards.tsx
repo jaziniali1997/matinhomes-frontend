@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 
 interface PropertyDetails {
   MlsStatus?: string;
@@ -46,7 +47,13 @@ export default function PropertyCards({ property }: Props) {
           key={card.id}
           className='bg-white rounded-[8px] flex flex-col items-start p-2 shadow-sm w-[160px] lg:w-[192px] h-[113px]'
         >
-          <img src={card.img} alt={card.title} className='w-[24px] mb-5' />
+          <Image
+            src={card.img}
+            alt={card.title}
+            width={24}
+            height={24}
+            className='mb-5'
+          />
           <h2 className='text-[12px] text-[#4D4D4D]'>{card.title}</h2>
           <p className='text-[15px] mt-2 text-[#061B2E] font-semibold'>
             {card.value}
