@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 const _url = process.env.NEXT_PUBLIC_BASE_URL;
 
 interface MediaItem {
   MediaURL: string;
+  MediaName: string;
 }
 
 interface Property {
@@ -31,17 +32,26 @@ export default function PropertyDetail() {
   const [current, setCurrent] = useState(0);
   const [images, setImages] = useState<string[]>([]);
 
-  // دریافت اطلاعات ملک
+  const next = useCallback(() => {
+    setCurrent((c) => (c + 1) % images.length);
+  }, [images.length]);
+
+  const prev = useCallback(() => {
+    setCurrent((c) => (c - 1 + images.length) % images.length);
+  }, [images.length]);
+
   useEffect(() => {
     const fetchProperty = async () => {
       try {
-        const res = await fetch(`${_url}/properties/${id}`);
+        const res = await fetch(`${_url}properties/${id}`);
         const data = await res.json();
 
         setProperty(data);
         const imgs =
-          data.MediaNames?.map((name: string) => `${data.MediaURL}${name}`) ||
-          [];
+          data.MediaNames && data.MediaNames.length > 0
+            ? data.MediaNames.map((name: string) => `${data.MediaURL}${name}`)
+            : ['/Image/default.jpg'];
+
         setImages(imgs);
       } catch (err) {
         console.error(err);
@@ -67,14 +77,7 @@ export default function PropertyDetail() {
       window.removeEventListener('keydown', handleKey);
       document.body.style.overflow = '';
     };
-  }, [showGallery, images.length]);
-
-  const next = () => {
-    setCurrent((c) => (c + 1) % images.length);
-  };
-  const prev = () => {
-    setCurrent((c) => (c - 1 + images.length) % images.length);
-  };
+  }, [showGallery, images.length, next, prev]);
 
   if (loading) {
     return (
@@ -88,13 +91,6 @@ export default function PropertyDetail() {
     return <p className='text-center mt-10'>Property not found.</p>;
 
   const photosCount = images.length;
-
-  const propertyData = {
-    BCRES_SaleOrRent: 'For Sale',
-    YearBuiltEffective: 2010,
-    FeedTypes: ['VOW', 'IDX'],
-    Ownership: 'Freehold NonStrata',
-  };
 
   return (
     <main className='bg-[#EBEBEB] pt-10 min-h-screen px-[16px] lg:px-[120px]'>
@@ -125,7 +121,13 @@ export default function PropertyDetail() {
               }}
               className='absolute bottom-3 right-3 flex items-center font-bold sm:hidden shadow-md bg-[#fff] text-[#005F82] px-3 py-2 rounded-[4px] hover:brightness-75 transition text-sm'
             >
-              <img className='mr-1' src='/Image/icons/new-picture.svg' alt='' />
+              <Image
+                className='mr-1'
+                src='/Image/icons/new-picture.svg'
+                alt=''
+                width={16}
+                height={16}
+              />
               {photosCount} Photos
             </div>
           </div>
@@ -166,10 +168,12 @@ export default function PropertyDetail() {
                 }}
                 className='absolute cursor-pointer hidden lg:flex items-center font-bold bottom-3 right-3 shadow-md bg-[#fff] text-[#005F82] px-3 py-2 rounded-[4px] hover:brightness-75 transition text-sm'
               >
-                <img
-                  className='mr-1'
+                <Image
                   src='/Image/icons/new-picture.svg'
-                  alt=''
+                  alt='New picture icon'
+                  width={16}
+                  height={16}
+                  className='mr-1'
                 />
                 {photosCount} Photos
               </div>
