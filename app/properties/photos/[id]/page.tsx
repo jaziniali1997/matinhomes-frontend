@@ -47,10 +47,11 @@ export default function PropertyDetail() {
         const data = await res.json();
 
         setProperty(data);
-        const imgs =
-          data.MediaNames && data.MediaNames.length > 0
-            ? data.MediaNames.map((name: string) => `${data.MediaURL}${name}`)
-            : ['/Image/default.jpg'];
+        const imgs: string[] = data?.MediaNames?.length
+          ? data.MediaNames.map(
+              (name: string) => `${data.MediaURL ?? ''}${name}`
+            )
+          : ['/Image/default.jpg'];
 
         setImages(imgs);
       } catch (err) {

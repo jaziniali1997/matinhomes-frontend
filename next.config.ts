@@ -3,7 +3,14 @@ import { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['api.matinhomes.ca'], 
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'api.matinhomes.ca',
+        port: '',
+        pathname: '/**',
+      },
+    ],
   },
 };
 
