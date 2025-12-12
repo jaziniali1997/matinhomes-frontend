@@ -1,15 +1,38 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 const _url = process.env.NEXT_PUBLIC_BASE_URL;
+
+interface RawProperty {
+  ListingKey: string;
+  NewListing: boolean;
+  Data?: {
+    MlsStatus?: string;
+    StreetNumber?: string;
+    StreetName?: string;
+    StreetSuffix?: string;
+    City?: string;
+    SubdivisionName?: string;
+    PropertySubType?: string;
+    BCRES_SaleOrRent?: string;
+    ListingId?: string;
+    BathroomsTotalInteger?: number;
+    BuildingAreaTotal?: number;
+    StateOrProvince?: string;
+    ListPrice?: number;
+    BedroomsTotal?: number;
+    PropertyType?: string;
+  };
+  Media?: { MediaURL: string; MediaName: string }[];
+}
 
 type TableColumn = {
   key: string;
   title?: string;
   icon?: string;
-  render: (p: Property) => any;
+  render: (p: Property) => React.ReactNode;
 };
 
 interface Property {
@@ -26,14 +49,14 @@ interface Property {
   ListingId: string;
   MediaName: string;
   PropertyType: string;
-  BathroomsTotalInteger: string;
-  BuildingAreaTotal: string;
+  BathroomsTotalInteger: string | number;
+  BuildingAreaTotal: string | number;
   StateOrProvince: string;
   ListPrice: number;
   BedroomsTotal?: number;
   BathroomsFull?: number;
   LivingArea?: number;
-  YearBuilt?: number;
+  YearBuilt?: number | null;
   Media?: { MediaURL: string; Order: number }[];
 }
 
@@ -80,14 +103,16 @@ export default function PropertyList({ initialData }: Props) {
     },
   ];
 
-  const fetchMore = async () => {
+  const fetchMore = useCallback(async () => {
     if (loading || !hasMore) return;
+
     setLoading(true);
+
     try {
       const res = await fetch(`${_url}properties/?page=${page}`);
-      const dataRaw = await res.json();
+      const dataRaw: RawProperty[] = await res.json();
 
-      const data = dataRaw.map((p: any) => ({
+      const data: Property[] = dataRaw.map((p) => ({
         ListingKey: p.ListingKey,
         MlsStatus: p.Data?.MlsStatus ?? '',
         NewListing: p.NewListing,
@@ -110,12 +135,12 @@ export default function PropertyList({ initialData }: Props) {
         YearBuilt: null,
         Media:
           Array.isArray(p.Media) && p.Media.length > 0
-            ? p.Media.map((m: any, index: number) => ({
+            ? p.Media.map((m, index) => ({
                 MediaURL: `${m.MediaURL}${m.MediaName}`,
                 Order: index + 1,
-                RealURL: `${m.MediaURL}${m.MediaName}`,
               }))
             : [{ MediaURL: '/Image/default.jpg', Order: 1 }],
+        MediaName: '',
       }));
 
       if (data.length === 0) setHasMore(false);
@@ -129,7 +154,7 @@ export default function PropertyList({ initialData }: Props) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [loading, hasMore, page]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -142,7 +167,7 @@ export default function PropertyList({ initialData }: Props) {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [page, loading, hasMore]);
+  }, [fetchMore]);
 
   return (
     <main className='min-h-screen bg-[#EBEBEB] p-6'>
@@ -231,7 +256,12 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
           </button>
 
           <button className='w-[32px] h-[24px] p-2 rounded-[4px] overflow-hidden bg-white shadow flex items-center justify-center hover:shadow-md transition'>
-            <img src='/Image/icons/call.svg' alt='icon' className='w-5 h-5' />
+            <Image
+              src='/Image/icons/call.svg'
+              alt='icon'
+              width={20}
+              height={20}
+            />{' '}
           </button>
         </div>
 
@@ -262,10 +292,12 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
                   }`}
                 >
                   {col.icon ? (
-                    <img
+                    <Image
                       src={col.icon}
                       alt=''
-                      className='mx-auto w-5 h-5 opacity-80'
+                      className='mx-auto opacity-80'
+                      width={20}
+                      height={20}
                     />
                   ) : (
                     col.title
