@@ -175,7 +175,7 @@ export default function Home() {
   }, [filters, page, loadingMore, hasMore, fetchProperties]);
 
   return (
-    <div className='w-[1200px] flex justify-center flex-col mx-auto'>
+    <div className='w-full lg:w-[1200px] flex justify-center flex-col mx-auto'>
       <FilterData
         onFilterChange={(newFilters: FiltersState) => setFilters(newFilters)}
       />

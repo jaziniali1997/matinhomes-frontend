@@ -94,7 +94,7 @@ function FilterItem({
   return (
     <div className='relative'>
       <button
-        className='flex items-center font-normal leading-[28px] tracking-[0] text-[16px] gap-2 h-[48px] px-3 py-2 bg-white text-[#061B2E] rounded-[4px] cursor-pointer'
+        className='flex items-center font-normal leading-[28px] tracking-[0] text-[12px] lg:text-[16px] gap-2 h-[32px] lg:h-[48px] px-3 py-2 bg-white text-[#061B2E] rounded-[4px] cursor-pointer'
         onClick={() => toggleFilter(filter.name)}
       >
         {filter.type === 'select' && filters.property_type
@@ -105,7 +105,7 @@ function FilterItem({
           alt={isOpen ? 'up arrow' : 'down arrow'}
           width={12}
           height={12}
-          className='ml-6'
+          className='ml-2 lg:ml-6'
         />
       </button>
 
@@ -187,7 +187,7 @@ export default function Filters({ onFilterChange }: FiltersProps) {
   };
 
   return (
-    <div className='w-full justify-between flex gap-1 rounded-[8px] p-5 mt-10 bg-[#4D4D4D]/10'>
+    <div className='w-full overflow-x-auto whitespace-nowrap flex-nowrap scrollbar-hide justify-between flex gap-1 rounded-[8px] p-5 mt-10 bg-[#4D4D4D]/10'>
       <div className='flex items-center gap-2 font-semibold'>
         <Image
           src='/Image/icons/setting-config.svg'
@@ -195,8 +195,10 @@ export default function Filters({ onFilterChange }: FiltersProps) {
           height={20}
           alt='filter icon'
         />
-        <p className='text-[16px] font-normal leading-[28px] tracking-[0]  pr-1 text-[#4D4D4D]'>Filter</p>
-        <div className='flex flex-wrap gap-2'>
+        <p className='text-[12px] lg:text-[16px] font-normal leading-[28px] tracking-[0]  pr-1 text-[#4D4D4D]'>
+          Filter
+        </p>
+        <div className='flex gap-2 '>
           {filtersData.map((filter) => (
             <FilterItem
               key={filter.name}
@@ -210,14 +212,14 @@ export default function Filters({ onFilterChange }: FiltersProps) {
         </div>
       </div>
 
-      <div className='flex items-center  gap-4'>
+      <div className='flex ml-10 lg:ml-0 items-center gap-2 lg:gap-4'>
         <button
           disabled={!hasAnyValue}
           onClick={() => {
             setFilters({});
             if (onFilterChange) onFilterChange({});
           }}
-          className={`px-3 py-3 h-[48px] font-normal leading-[28px] tracking-[0] text-white  transition
+          className={`px-3 py-0 lg:py-3 h-[32px] lg:h-[48px] font-normal leading-[28px] tracking-[0] text-white text-[12px] lg:text-[16px] transition
       ${
         hasAnyValue
           ? 'bg-gray-600 rounded-[4px] cursor-pointer'
@@ -229,7 +231,7 @@ export default function Filters({ onFilterChange }: FiltersProps) {
         <button
           disabled={!hasAnyValue}
           onClick={applyFilters}
-          className={`px-5 py-3 h-[48px] font-normal leading-[28px] tracking-[0] text-white transition 
+          className={`px-5 py-0 lg:py-3 h-[32px] text-[12px] lg:text-[16px] lg:h-[48px] font-normal leading-[28px] tracking-[0] text-white transition 
       ${
         hasAnyValue
           ? 'bg-[#005F82] rounded-[4px] cursor-pointer'

@@ -188,7 +188,7 @@ export default function PropertyList({ initialData, filters }: Props) {
   }, [fetchMore]);
 
   return (
-    <main className='min-h-screen bg-[#EBEBEB] py-6'>
+    <main className='flex min-h-screen bg-[#EBEBEB] py-6'>
       <div className='max-w-[1200px] mx-auto'>
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
           {properties.map((p) => (
@@ -297,8 +297,8 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
           {p.PropertyType}
         </div>
 
-        <div className='absolute  font-black leading-[100%] tracking-[0] flex justify-center items-center bottom-4 right-0 z-30 bg-[#00AD6280]/50 rounded-tl-[16.5px] rounded-bl-[16.5px] text-white px-3 py-1  text-[14px] w-fit h-[32px]'>
-          ${p.ListPrice}
+        <div className='absolute font-black leading-[100%] tracking-[0] flex justify-center items-center bottom-4 right-0 z-30 bg-[#00AD6280]/50 rounded-tl-[16.5px] rounded-bl-[16.5px] text-white px-3 py-1 text-[14px] w-fit h-[32px]'>
+          ${p.ListPrice?.toLocaleString()}
         </div>
       </div>
 
@@ -381,7 +381,8 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
                   key={idx}
                   className='w-full text-[16px] text-left border border-b border-[#EBEBEB] px-4 py-2 hover:bg-blue-100'
                   style={{
-                    background: 'linear-gradient(90deg, #061B2E 0%, #005F82 60%)',
+                    background:
+                      'linear-gradient(90deg, #061B2E 0%, #005F82 60%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                   }}
