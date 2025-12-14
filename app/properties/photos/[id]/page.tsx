@@ -192,7 +192,6 @@ export default function PropertyDetail() {
             ✕
           </button>
 
-          {/* counter */}
           <div className='absolute top-6 left-6 text-white text-sm bg-black/40 px-3 py-1 rounded-lg'>
             {current + 1} / {photosCount}
           </div>

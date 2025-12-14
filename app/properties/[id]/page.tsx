@@ -129,10 +129,12 @@ export default function PropertyDetail() {
                   height={20}
                   className='mr-2'
                 />
-                {property.BuildingAreaTotal
-                  ? property.BuildingAreaTotal.toLocaleString()
-                  : 'N/A'}{' '}
-                sqft
+                <p className='text-[14px] font-semibold leading-[100%] tracking-[0]'>
+                  {property.BuildingAreaTotal
+                    ? property.BuildingAreaTotal.toLocaleString()
+                    : 'N/A'}{' '}
+                  sqft
+                </p>
               </span>
 
               <span className='bg-[#fff] flex items-center w-fit h-[32px] px-2 py-1 rounded-lg'>
@@ -143,7 +145,9 @@ export default function PropertyDetail() {
                   height={20}
                   className='mr-2'
                 />
-                {property.BathroomsTotalInteger ?? 'N/A'}
+                <p className='text-[14px] font-semibold leading-[100%] tracking-[0]'>
+                  {property.BathroomsTotalInteger ?? 'N/A'}
+                </p>
               </span>
 
               <span className='bg-[#fff] flex items-center w-fit h-[32px] px-2 py-1 rounded-lg'>
@@ -154,16 +158,17 @@ export default function PropertyDetail() {
                   height={20}
                   className='mr-2'
                 />
-                {property.BathroomsFull ?? 'N/A'}
+                <p className='text-[14px] font-semibold leading-[100%] tracking-[0]'>
+                  {property.BathroomsFull ?? 'N/A'}
+                </p>
               </span>
             </div>
 
             <div className='mt-10 space-y-3'>
               <h1
-                className='lg:text-[40px] text-[26px] font-bold'
+                className='lg:text-[40px]  font-semibold leading-[100%] tracking-[0] text-[28px]'
                 style={{
-                  background:
-                    'linear-gradient(90deg, #061B2E 0%, #005F82 100%)',
+                  background: 'linear-gradient(90deg, #061B2E 0%, #005F82 20%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                 }}
@@ -171,14 +176,11 @@ export default function PropertyDetail() {
                 {property.StreetNumber} {property.StreetName}{' '}
                 {property.StreetSuffix}
               </h1>
-              <p className='text-[#4d4d4d] text-[16px] lg:text-[20px]'>
+              <p className='text-[#4d4d4d]  font-normal leading-[32px] tracking-[0] text-[16px] lg:text-[20px]'>
                 {property.SubdivisionName} {property.City}
               </p>
 
-              <p className='text-[20px] lg:text-[24px] flex items-center text-[#005F82]'>
-                {/* <span className='text-[#4d4d4d] mr-2 font-bold text-[14px] lg:text-[16px]'>
-                  Last listed from
-                </span> */}
+              <p className='text-[20px] font-bold  leading-[100%] tracking-[0] lg:text-[24px] flex items-center text-[#005F82]'>
                 $
                 {property.ListPrice
                   ? property.ListPrice.toLocaleString('en-CA')
@@ -190,16 +192,16 @@ export default function PropertyDetail() {
 
           <div className='flex w-fit flex-col'>
             <h2
-              className='text-[26px] lg:text-[40px] '
+              className='text-[26px] mb-10 leading-[100%] tracking-[0] font-semibold lg:text-[40px] '
               style={{
-                background: 'linear-gradient(90deg, #061B2E 0%, #005F82 100%)',
+                background: 'linear-gradient(90deg, #061B2E 0%, #005F82 20%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
               }}
             >
               Overview
             </h2>
-            <p className='text-[14px] lg:text-[16px] text-[#4d4d4d]'>
+            <p className='text-[14px]  leading-[28px] font-normal tracking-[0] lg:text-[16px] text-[#4d4d4d]'>
               {' '}
               {property.PublicRemarks || 'No legal description available'}
             </p>
@@ -207,9 +209,9 @@ export default function PropertyDetail() {
 
           <div className='py-10'>
             <h2
-              className='text-[26px] lg:text-[40px]'
+              className='text-[26px] mb-10 leading-[100%] font-semibold tracking-[0] lg:text-[40px]'
               style={{
-                background: 'linear-gradient(6deg, #061B2E 10%, #005F82 100%)',
+                background: 'linear-gradient(90deg, #061B2E 0%, #005F82 20%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
               }}
@@ -226,9 +228,9 @@ export default function PropertyDetail() {
 
           <div>
             <h2
-              className='text-[26px] lg:text-[40px] mb-4'
+              className='text-[26px] font-semibold leading-[100%] mb-10 tracking-[0] lg:text-[40px] mb-4'
               style={{
-                background: 'linear-gradient(90deg, #061B2E 0%, #005F82 100%)',
+                background: 'linear-gradient(90deg, #061B2E 0%, #005F82 20%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
               }}
@@ -255,7 +257,9 @@ export default function PropertyDetail() {
                   },
                   {
                     title: 'Price',
-                    value: property.ListPrice ?? '---',
+                    value: property.ListPrice
+                      ? `$${property.ListPrice.toLocaleString()}`
+                      : '---',
                   },
                   {
                     title: 'Levels',
@@ -277,10 +281,10 @@ export default function PropertyDetail() {
                     key={idx}
                     className='flex flex-col justify-between py-2 border-b border-gray-300'
                   >
-                    <span className='text-[#4D4D4D] pb-2 text-[16px]'>
+                    <span className='text-[#4D4D4D]  font-normal leading-[28px] tracking-[0] pb-2 text-[16px]'>
                       {item.title}
                     </span>
-                    <span className='text-[#061B2E] text-[16px] font-semibold'>
+                    <span className='text-[#061B2E]  leading-[28px] tracking-[0] text-[16px] font-semibold'>
                       {item.value}
                     </span>
                   </div>
@@ -312,10 +316,10 @@ export default function PropertyDetail() {
                     key={idx}
                     className='flex flex-col justify-between py-2 border-b border-gray-300'
                   >
-                    <span className='text-[#4D4D4D] pb-2 text-[16px]'>
+                    <span className='text-[#4D4D4D] tracking-[0] leading-[28px] pb-2 text-[16px]'>
                       {item.title}
                     </span>
-                    <span className='text-[#061B2E] text-[16px] font-semibold'>
+                    <span className='text-[#061B2E] tracking-[0] leading-[28px] text-[16px] font-semibold'>
                       {item.value}
                     </span>
                   </div>

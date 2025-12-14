@@ -52,10 +52,10 @@ export default function PropertyCards({ property }: Props) {
             alt={card.title}
             width={24}
             height={24}
-            className='mb-5'
+            className='mb-5 pt-2 ml-1'
           />
-          <h2 className='text-[12px] text-[#4D4D4D]'>{card.title}</h2>
-          <p className='text-[15px] mt-2 text-[#061B2E] font-semibold'>
+          <h2 className='text-[12px]  leading-[100%] font-normal tracking-[0] text-[#4D4D4D]'>{card.title}</h2>
+          <p className='text-[16px] mt-2  leading-[100%] tracking-[0] text-[#061B2E] font-bold'>
             {card.value}
           </p>
         </div>
