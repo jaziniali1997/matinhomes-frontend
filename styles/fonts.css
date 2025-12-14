@@ -1,0 +1,7 @@
+@font-face {
+  font-family: 'Red Hat Display';
+  src: url("/fonts/RedHatDisplay.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}

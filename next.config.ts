@@ -10,6 +10,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.matinhomes.ca',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };
