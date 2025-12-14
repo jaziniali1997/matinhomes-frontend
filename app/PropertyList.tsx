@@ -28,6 +28,10 @@ interface RawProperty {
   Media?: { MediaURL: string; MediaName: string }[];
 }
 
+export interface FiltersState {
+  [key: string]: string | number | undefined;
+}
+
 type TableColumn = {
   key: string;
   title?: string;
@@ -62,6 +66,7 @@ interface Property {
 
 interface Props {
   initialData: Property[];
+  filters: FiltersState;
 }
 
 interface CardProps {
@@ -69,7 +74,7 @@ interface CardProps {
   tableCols: TableColumn[];
 }
 
-export default function PropertyList({ initialData }: Props) {
+export default function PropertyList({ initialData, filters }: Props) {
   const [properties, setProperties] = useState<Property[]>(initialData);
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
@@ -109,13 +114,26 @@ export default function PropertyList({ initialData }: Props) {
     setLoading(true);
 
     try {
-      const res = await fetch(`${_url}properties/?page=${page}`);
+      const params = new URLSearchParams();
+      params.append('page', String(page));
+      params.append('page_size', '12');
+
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== '') {
+          params.append(key, String(value));
+        }
+      });
+
+      const url = `${_url}properties/?${params.toString()}`;
+      console.log('FETCH MORE →', url);
+
+      const res = await fetch(url);
       const dataRaw: RawProperty[] = await res.json();
 
       const data: Property[] = dataRaw.map((p) => ({
         ListingKey: p.ListingKey,
-        MlsStatus: p.Data?.MlsStatus ?? '',
         NewListing: p.NewListing,
+        MlsStatus: p.Data?.MlsStatus ?? '',
         StreetNumber: p.Data?.StreetNumber ?? '',
         StreetName: p.Data?.StreetName ?? '',
         StreetSuffix: p.Data?.StreetSuffix ?? '',
@@ -154,7 +172,7 @@ export default function PropertyList({ initialData }: Props) {
     } finally {
       setLoading(false);
     }
-  }, [loading, hasMore, page]);
+  }, [loading, hasMore, page, filters]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -170,7 +188,7 @@ export default function PropertyList({ initialData }: Props) {
   }, [fetchMore]);
 
   return (
-    <main className='min-h-screen bg-[#EBEBEB] p-6'>
+    <main className='min-h-screen bg-[#EBEBEB] py-6'>
       <div className='max-w-[1200px] mx-auto'>
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
           {properties.map((p) => (
@@ -216,7 +234,11 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
   return (
     <div className='group bg-white rounded-[8px] shadow-sm  hover:shadow-md transition w-[328px] h-fit sm:w-[384px] p-[12px]'>
       <div className='pb-4 leading-[28px] min-h-[100px]'>
-        <p className='text-[#061b2e] text-[18px]'>
+        <p
+          className='text-[#061b2e] font-medium
+          leading-[28px] tracking-[0] text-[18px]'
+          style={{ fontFamily: 'Red Hat Display' }}
+        >
           {p.StreetNumber} {p.StreetName} {p.StreetSuffix} in {p.City}
         </p>
         <p className='text-[#061b2e] text-[18px]'>
@@ -252,7 +274,13 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
 
         <div className='absolute top-2 right-2 flex items-center gap-2 z-30'>
           <button className='bg-[#00AD62]/50 border border-[#00AD62] text-white px-3 rounded-t-[12px] rounded-b-[16.5px] w-[55px] h-[24px] text-sm hover:bg-[#0294cc] transition'>
-            <p className='text-[12px]'>Open</p>
+            <p
+              className='text-[12px] font-semibold  leading-[100%] tracking-[0]
+              '
+              style={{ fontFamily: 'Red Hat Display' }}
+            >
+              Open
+            </p>
           </button>
 
           <button className='w-[32px] h-[24px] p-2 rounded-[4px] overflow-hidden bg-white shadow flex items-center justify-center hover:shadow-md transition'>
@@ -265,11 +293,11 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
           </button>
         </div>
 
-        <div className='absolute flex justify-center items-center bottom-4 left-0 z-30 bg-[#005F82CC]/80 text-white px-3  rounded-tr-[16.5px] rounded-br-[16.5px] text-[11px] w-fit h-[32px]'>
+        <div className='absolute flex font-semibold leading-[100%] tracking-[0] justify-center items-center bottom-4 left-0 z-30 bg-[#005F82CC]/80 text-white px-3  rounded-tr-[16.5px] rounded-br-[16.5px] text-[12px] w-fit h-[32px]'>
           {p.PropertyType}
         </div>
 
-        <div className='absolute  flex justify-center items-center bottom-4 right-0 z-30 bg-[#00AD6280]/50 rounded-tl-[16.5px] rounded-bl-[16.5px] text-white px-3 py-1  text-[11px] w-fit h-[32px]'>
+        <div className='absolute  font-black leading-[100%] tracking-[0] flex justify-center items-center bottom-4 right-0 z-30 bg-[#00AD6280]/50 rounded-tl-[16.5px] rounded-bl-[16.5px] text-white px-3 py-1  text-[14px] w-fit h-[32px]'>
           ${p.ListPrice}
         </div>
       </div>
@@ -281,7 +309,7 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
               {tableCols.map((col, index) => (
                 <th
                   key={col.key}
-                  className={`h-[28px] text-[12px] text-[#4D4D4D] font-semibold border-b border-[#EBEBEB] ${
+                  className={`h-[28px] font-normal leading-[100%] tracking-[0] text-[12px] text-[#4D4D4D]  border-b border-[#EBEBEB] ${
                     index === 0 ? 'rounded-tl-[4px]' : ''
                   } ${
                     index === tableCols.length - 1 ? 'rounded-tr-[4px]' : ''
@@ -312,7 +340,7 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
               {tableCols.map((col, index) => (
                 <td
                   key={col.key}
-                  className={`h-[28px] text-[#061B2E] text-[12px] font-bold border-b border-[#EBEBEB] ${
+                  className={`h-[28px]  leading-[100%] tracking-[0] text-[#061B2E] text-[12px] font-bold border-b border-[#EBEBEB] ${
                     index !== tableCols.length - 1
                       ? 'border-r border-[#EBEBEB]'
                       : ''
@@ -330,7 +358,7 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
 
       <div className='flex mt-6 justify-between items-center overflow-visible'>
         <Link href={`/properties/photos/${p.ListingKey}`}>
-          <button className='bg-[#005F82] cursor-pointer text-white text-[16px] rounded-[4px] px-5 py-2'>
+          <button className='bg-[#005F82] leading-[28px] tracking-[0] font-medium cursor-pointer text-white text-[14px] rounded-[4px] px-5 py-2'>
             Details
           </button>
         </Link>
@@ -341,17 +369,22 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
               e.stopPropagation();
               setOpen((prev) => !prev);
             }}
-            className='bg-[#EBEBEB] rounded-[4px] px-5 py-2 text-[16px] text-black transition-colors'
+            className='bg-[#EBEBEB] hover:bg-[#B4E7FA] font-medium leading-[28px] tracking-[0] rounded-[4px] px-5 py-2 text-[16px] text-black transition-colors'
           >
             More...
           </button>
 
           {open && (
-            <div className='absolute top-full mt-2 right-0 w-48 text-[#061B2E] bg-white rounded shadow-lg border border-gray-200 z-50'>
+            <div className='absolute top-full mt-2 right-0 w-56 text-[#061B2E] bg-white rounded shadow-lg border border-gray-200 z-50'>
               {menuItems.map((item, idx) => (
                 <button
                   key={idx}
                   className='w-full text-[16px] text-left border border-b border-[#EBEBEB] px-4 py-2 hover:bg-blue-100'
+                  style={{
+                    background: 'linear-gradient(90deg, #061B2E 0%, #005F82 60%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}
                 >
                   {item}
                 </button>
