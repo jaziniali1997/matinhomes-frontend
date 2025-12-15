@@ -48,10 +48,10 @@ export default function PropertyDetail() {
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
   const [propertyData, setPropertyData] = useState<PropertyDetails>({
-    MlsStatus: 'N/A',
-    YearBuiltEffective: 'N/A',
-    PropertySubType: ['N/A'],
-    ListingContractDate: 'N/A',
+    MlsStatus: '---',
+    YearBuiltEffective: '---',
+    PropertySubType: ['---'],
+    ListingContractDate: '---',
   });
 
   useEffect(() => {
@@ -87,12 +87,12 @@ export default function PropertyDetail() {
         });
 
         setPropertyData({
-          MlsStatus: data.Data.MlsStatus || 'N/A',
-          YearBuiltEffective: data.Data.YearBuilt || 'N/A',
+          MlsStatus: data.Data.MlsStatus || '---',
+          YearBuiltEffective: data.Data.YearBuilt || '---',
           PropertySubType: data.Data.PropertySubType
             ? data.Data.PropertySubType
-            : ['N/A'],
-          ListingContractDate: data.Data.ListingContractDate || 'N/A',
+            : ['---'],
+          ListingContractDate: data.Data.ListingContractDate || '---',
         });
       } catch (err) {
         console.error(err);
@@ -113,7 +113,7 @@ export default function PropertyDetail() {
   }
 
   if (!property)
-    return <p className='text-center mt-10'>Property not found.</p>;
+    return <p className='text-center h-[20vh] mt-10'>Property not found.</p>;
 
   return (
     <main className='bg-[#EBEBEB] min-h-screen px-[16px] lg:px-[120px]'>
@@ -132,7 +132,7 @@ export default function PropertyDetail() {
                 <p className='text-[14px] font-semibold leading-[100%] tracking-[0]'>
                   {property.BuildingAreaTotal
                     ? property.BuildingAreaTotal.toLocaleString()
-                    : 'N/A'}{' '}
+                    : '---'}{' '}
                   sqft
                 </p>
               </span>
@@ -146,7 +146,7 @@ export default function PropertyDetail() {
                   className='mr-2'
                 />
                 <p className='text-[14px] font-semibold leading-[100%] tracking-[0]'>
-                  {property.BathroomsTotalInteger ?? 'N/A'}
+                  {property.BathroomsTotalInteger ?? '---'}
                 </p>
               </span>
 
@@ -159,14 +159,14 @@ export default function PropertyDetail() {
                   className='mr-2'
                 />
                 <p className='text-[14px] font-semibold leading-[100%] tracking-[0]'>
-                  {property.BathroomsFull ?? 'N/A'}
+                  {property.BathroomsFull ?? '---'}
                 </p>
               </span>
             </div>
 
             <div className='mt-10 space-y-3'>
               <h1
-                className='lg:text-[40px]  font-semibold leading-[100%] tracking-[0] text-[28px]'
+                className='lg:text-[40px] font-semibold leading-[100%] tracking-[0] text-[28px]'
                 style={{
                   background: 'linear-gradient(90deg, #061B2E 0%, #005F82 20%)',
                   WebkitBackgroundClip: 'text',
@@ -184,7 +184,7 @@ export default function PropertyDetail() {
                 $
                 {property.ListPrice
                   ? property.ListPrice.toLocaleString('en-CA')
-                  : 'N/A'}
+                  : '---'}
               </p>
             </div>
           </div>
@@ -228,7 +228,7 @@ export default function PropertyDetail() {
 
           <div>
             <h2
-              className='text-[26px] font-semibold leading-[100%] mb-10 tracking-[0] lg:text-[40px] mb-4'
+              className='text-[26px] font-semibold leading-[100%] mb-10 tracking-[0] lg:text-[40px]'
               style={{
                 background: 'linear-gradient(90deg, #061B2E 0%, #005F82 20%)',
                 WebkitBackgroundClip: 'text',

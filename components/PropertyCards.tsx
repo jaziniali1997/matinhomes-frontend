@@ -17,25 +17,25 @@ export default function PropertyCards({ property }: Props) {
     {
       id: 1,
       title: 'Listing Status',
-      value: property.MlsStatus || 'N/A',
+      value: property.MlsStatus || '---',
       img: '/Image/icons/check-one.svg',
     },
     {
       id: 2,
       title: 'Built in',
-      value: property.YearBuiltEffective || 'N/A',
+      value: property.YearBuiltEffective || '---',
       img: '/Image/icons/calendar-three.svg',
     },
     {
       id: 3,
       title: 'Building Type',
-      value: property.PropertySubType || 'N/A',
+      value: property.PropertySubType || '---',
       img: '/Image/icons/city-one.svg',
     },
     {
       id: 4,
       title: 'Builder Name',
-      value: property.ListingContractDate || 'N/A',
+      value: property.ListingContractDate || '---',
       img: '/Image/icons/compass.svg',
     },
   ];
