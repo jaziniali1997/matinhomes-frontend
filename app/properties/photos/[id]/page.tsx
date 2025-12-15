@@ -98,7 +98,7 @@ export default function PropertyDetail() {
       <div className='max-w-[1318px] mx-auto rounded-lg'>
         <div className='flex flex-col sm:flex-row gap-4 justify-center items-center'>
           <div
-            className='relative w-[328px] h-[217px] sm:w-[793px] sm:h-[523px] rounded-lg overflow-hidden cursor-pointer'
+            className='relative w-[328px] h-[217px] lg:w-[900px] lg:h-[523px] rounded-lg overflow-hidden cursor-pointer'
             onClick={() => {
               setCurrent(0);
               setShowGallery(true);
