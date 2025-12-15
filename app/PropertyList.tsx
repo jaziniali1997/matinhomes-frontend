@@ -89,17 +89,17 @@ export default function PropertyList({ initialData, filters }: Props) {
     {
       key: 'ListingId',
       title: 'MLS®#',
-      render: (p) => p.ListingId ?? 'N/A',
+      render: (p) => p.ListingId ?? '---',
     },
     {
       key: 'BedroomsTotal',
       icon: '/Image/icons/single-bed.svg',
-      render: (p) => p.BedroomsTotal ?? 'N/A',
+      render: (p) => p.BedroomsTotal ?? '---',
     },
     {
       key: 'BathroomsTotalInteger',
       icon: '/Image/icons/shower-head.svg',
-      render: (p) => p.BathroomsTotalInteger ?? 'N/A',
+      render: (p) => p.BathroomsTotalInteger ?? '---',
     },
     {
       key: 'BuildingAreaTotal',
@@ -233,20 +233,26 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
 
   return (
     <div className='group bg-white rounded-[8px] shadow-sm  hover:shadow-md transition w-[328px] h-fit sm:w-[384px] p-[12px]'>
-      <div className='pb-4 leading-[28px] min-h-[100px]'>
-        <p
-          className='text-[#061b2e] font-medium
-          leading-[28px] tracking-[0] text-[18px]'
-          style={{ fontFamily: 'Red Hat Display' }}
-        >
-          {p.StreetNumber} {p.StreetName} {p.StreetSuffix} in {p.City}
-        </p>
-        <p className='text-[#061b2e] text-[18px]'>
-          {p.SubdivisionName} {p.PropertySubType} {p.BCRES_SaleOrRent} in{' '}
-          {p.SubdivisionName}: MLS®#
-        </p>
-      </div>
-
+      <Link
+        href={`${process.env.NEXT_PUBLIC_LISTING_URL}?ListingKey=${p.ListingKey}`}
+      >
+        <div className='pb-4 leading-[28px] min-h-[100px]'>
+          <p
+            className='text-[#061b2e] font-medium
+          leading-[28px] tracking-[0px] text-[18px]'
+            style={{ fontFamily: 'Red Hat Display' }}
+          >
+            {p.StreetNumber} {p.StreetName} {p.StreetSuffix} in {p.City}
+          </p>
+          <p
+            className='text-[#061b2e] font-medium
+          leading-[28px] tracking-[0px] text-[18px]'
+          >
+            {p.SubdivisionName} {p.PropertySubType} {p.BCRES_SaleOrRent} in{' '}
+            {p.SubdivisionName}: MLS®#
+          </p>
+        </div>
+      </Link>
       <div className='relative w-full h-60 overflow-hidden rounded-[4px]'>
         <Image
           key={`${p.MediaName}`}
@@ -260,7 +266,7 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
 
         {p.NewListing && (
           <div
-            className='absolute top-[84px] left-[-22px] z-20 bg-[#061B2ECC]/80 text-white font-semibold tracking-wide flex items-center justify-center'
+            className='absolute top-[84px] left-[-22px] z-20 bg-[#061B2ECC]/80 text-white  flex items-center justify-center'
             style={{
               width: '150px',
               height: '32px',
@@ -268,7 +274,9 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
               transformOrigin: 'top left',
             }}
           >
-            <p className='text-[11px]'>NEW LISTING</p>
+            <p className='text-[11px] font-semibold tracking-[0px] leading-[100%]'>
+              NEW LISTING
+            </p>
           </div>
         )}
 
@@ -293,11 +301,11 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
           </button>
         </div>
 
-        <div className='absolute flex font-semibold leading-[100%] tracking-[0] justify-center items-center bottom-4 left-0 z-30 bg-[#005F82CC]/80 text-white px-3  rounded-tr-[16.5px] rounded-br-[16.5px] text-[12px] w-fit h-[32px]'>
+        <div className='absolute flex font-semibold leading-[100%] tracking-[0] justify-center items-center bottom-4 left-0 z-30 bg-[#005F82CC]/80 text-white px-3  rounded-tr-[16.5px] rounded-br-[16.5px] text-[12px] w-fit h-[32px] backdrop-blur-[4px]'>
           {p.PropertyType}
         </div>
 
-        <div className='absolute font-black leading-[100%] tracking-[0] flex justify-center items-center bottom-4 right-0 z-30 bg-[#00AD6280]/50 rounded-tl-[16.5px] rounded-bl-[16.5px] text-white px-3 py-1 text-[14px] w-fit h-[32px]'>
+        <div className='absolute font-black leading-[100%] tracking-[0] flex justify-center items-center bottom-4 right-0 z-30 bg-[#00AD6280]/50 rounded-tl-[16.5px] rounded-bl-[16.5px] text-white px-3 py-1 text-[14px] w-fit h-[32px] backdrop-blur-[4px]'>
           ${p.ListPrice?.toLocaleString()}
         </div>
       </div>
@@ -357,9 +365,13 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
       </div>
 
       <div className='flex mt-6 justify-between items-center overflow-visible'>
-        <Link href={`/properties/photos/${p.ListingKey}`}>
-          <button className='bg-[#005F82] leading-[28px] tracking-[0] font-medium cursor-pointer text-white text-[14px] rounded-[4px] px-5 py-2'>
-            Details
+        <Link
+          href={`${process.env.NEXT_PUBLIC_LISTING_URL}?ListingKey=${p.ListingKey}`}
+        >
+          <button className='bg-[#005F82]  cursor-pointer  rounded-[4px] px-5 py-2'>
+            <p className='leading-[28px] tracking-[0] font-medium text-white text-[14px]'>
+              Details
+            </p>
           </button>
         </Link>
 
