@@ -116,11 +116,11 @@ export default function PropertyDetail() {
     return <p className='text-center h-[20vh] mt-10'>Property not found.</p>;
 
   return (
-    <main className='bg-[#EBEBEB] min-h-screen px-[16px] lg:px-[120px]'>
-      <div className='max-w-[1200px] mx-auto rounded-lg'>
-        <div className='max-w-[793px]'>
+    <main className='bg-[#EBEBEB] h-screen overflow-y-auto'>
+      <div className='md:max-w-[1318px] mx-auto rounded-lg'>
+        <div className='max-w-[768px]'>
           <div className=' '>
-            <div className='flex pt-5 flex-wrap items-center gap-2 text-gray-700 text-sm'>
+            <div className='flex  flex-wrap items-center gap-2 text-gray-700 text-sm'>
               <span className='bg-[#fff] flex items-center w-fit h-[32px] rounded-[4px] px-2 py-1'>
                 <Image
                   src='/Image/icons/ruler.svg'
