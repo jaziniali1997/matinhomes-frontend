@@ -94,8 +94,8 @@ export default function PropertyDetail() {
   const photosCount = images.length;
 
   return (
-    <main className='bg-[#EBEBEB] pt-10 min-h-screen px-[16px] lg:px-[120px]'>
-      <div className='max-w-[1200px] mx-auto rounded-lg'>
+    <main className='bg-[#EBEBEB] min-h-screen '>
+      <div className='max-w-[1318px] mx-auto rounded-lg'>
         <div className='flex flex-col sm:flex-row gap-4 justify-center items-center'>
           <div
             className='relative w-[328px] h-[217px] sm:w-[793px] sm:h-[523px] rounded-lg overflow-hidden cursor-pointer'
@@ -109,6 +109,7 @@ export default function PropertyDetail() {
               alt={property.StreetName || ''}
               fill
               className='object-cover'
+              priority
             />
             {/* {property.YearBuilt && (
               <span className='absolute top-3 left-3 z-10 w-[88px] h-[24px] p-1 bg-[#061b2e] text-white rounded-[16px] flex items-center justify-center text-[12px]'>
@@ -133,7 +134,7 @@ export default function PropertyDetail() {
             </div>
           </div>
 
-          <div className='lg:flex flex-col gap-4 hidden sm:flex'>
+          <div className='flex-col gap-4 hidden md:flex'>
             <div
               className='relative w-[386px] h-[251px] rounded-[8px] overflow-hidden cursor-pointer'
               onClick={() => {
@@ -146,6 +147,8 @@ export default function PropertyDetail() {
                 alt={property.StreetName || ''}
                 fill
                 className='object-cover'
+                priority={false}
+                loading='lazy'
               />
             </div>
 
@@ -161,6 +164,8 @@ export default function PropertyDetail() {
                 alt={property.StreetName || ''}
                 fill
                 className='object-cover'
+                priority={false}
+                loading='lazy'
               />
               <div
                 onClick={() => {
@@ -202,7 +207,8 @@ export default function PropertyDetail() {
               alt={`Photo ${current + 1}`}
               fill
               className='object-contain rounded-lg'
-              priority
+              priority={false}
+              loading='lazy'
             />
           </div>
 
