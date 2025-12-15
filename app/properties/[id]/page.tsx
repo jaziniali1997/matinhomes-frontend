@@ -116,7 +116,7 @@ export default function PropertyDetail() {
     return <p className='text-center h-[20vh] mt-10'>Property not found.</p>;
 
   return (
-    <main className='bg-[#EBEBEB] h-screen overflow-y-auto'>
+    <main className='bg-[#EBEBEB] '>
       <div className='md:max-w-[1318px] mx-auto rounded-lg'>
         <div className='max-w-[768px]'>
           <div className=' '>

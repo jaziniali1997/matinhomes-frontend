@@ -44,18 +44,27 @@ interface DropdownPortalProps {
 
 function DropdownPortal({ anchorRef, children }: DropdownPortalProps) {
   const [coords, setCoords] = useState({ top: 0, left: 0 });
+  const [isReady, setIsReady] = useState(false);
+  const [anchorWidth, setAnchorWidth] = useState(150);
 
   useEffect(() => {
     function updatePosition() {
       if (!anchorRef.current) return;
+
       const rect = anchorRef.current.getBoundingClientRect();
+
       setCoords({
         top: rect.bottom + window.scrollY,
         left: rect.left + window.scrollX,
       });
+
+      setAnchorWidth(anchorRef.current.offsetWidth);
+
+      setIsReady(true);
     }
 
     updatePosition();
+
     window.addEventListener('resize', updatePosition);
     window.addEventListener('scroll', updatePosition, true);
 
@@ -65,7 +74,7 @@ function DropdownPortal({ anchorRef, children }: DropdownPortalProps) {
     };
   }, [anchorRef]);
 
-  if (!anchorRef.current) return null;
+  if (!isReady) return null;
 
   return createPortal(
     <div
@@ -74,7 +83,7 @@ function DropdownPortal({ anchorRef, children }: DropdownPortalProps) {
         top: coords.top,
         left: coords.left,
         zIndex: 9999,
-        minWidth: anchorRef.current.offsetWidth,
+        minWidth: anchorWidth, 
       }}
     >
       {children}
@@ -91,7 +100,13 @@ interface FilterItemProps {
   setFilters: (filters: FiltersState) => void;
 }
 
-function FilterItem({ filter, openFilter, toggleFilter, filters, setFilters }: FilterItemProps) {
+function FilterItem({
+  filter,
+  openFilter,
+  toggleFilter,
+  filters,
+  setFilters,
+}: FilterItemProps) {
   const isOpen = openFilter === filter.name;
   const buttonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -103,10 +118,17 @@ function FilterItem({ filter, openFilter, toggleFilter, filters, setFilters }: F
     Price: 'price',
   };
 
-  const handleRangeChange = (type: 'min' | 'max', label: string, value: string) => {
+  const handleRangeChange = (
+    type: 'min' | 'max',
+    label: string,
+    value: string
+  ) => {
     const apiKey = apiKeyMap[label];
     if (!apiKey) return;
-    setFilters({ ...filters, [`${type}_${apiKey}`]: value ? Number(value) : undefined });
+    setFilters({
+      ...filters,
+      [`${type}_${apiKey}`]: value ? Number(value) : undefined,
+    });
   };
 
   const handleSelectChange = (value: string) => {
@@ -121,7 +143,9 @@ function FilterItem({ filter, openFilter, toggleFilter, filters, setFilters }: F
         className='flex items-center font-normal leading-[28px] tracking-[0] text-[12px] lg:text-[16px] gap-2 h-[32px] lg:h-[48px] px-3 py-2 bg-white text-[#061B2E] rounded-[4px] cursor-pointer'
         onClick={() => toggleFilter(filter.name)}
       >
-        {filter.type === 'select' && filters.property_type ? filters.property_type : filter.name}
+        {filter.type === 'select' && filters.property_type
+          ? filters.property_type
+          : filter.name}
         <Image
           src={isOpen ? upIcon : downIcon}
           alt={isOpen ? 'up arrow' : 'down arrow'}
@@ -131,7 +155,7 @@ function FilterItem({ filter, openFilter, toggleFilter, filters, setFilters }: F
         />
       </button>
 
-      {isOpen && buttonRef.current && (
+      {isOpen && (
         <DropdownPortal anchorRef={buttonRef}>
           <div className='p-2 border rounded bg-white shadow-md w-56 max-h-60 overflow-y-auto'>
             {filter.type === 'range' && (
@@ -143,7 +167,9 @@ function FilterItem({ filter, openFilter, toggleFilter, filters, setFilters }: F
                   <input
                     type='number'
                     placeholder={`Enter Min ${filter.name}`}
-                    onChange={(e) => handleRangeChange('min', filter.name, e.target.value)}
+                    onChange={(e) =>
+                      handleRangeChange('min', filter.name, e.target.value)
+                    }
                     value={filters[`min_${apiKeyMap[filter.name]}`] ?? ''}
                     className='w-full bg-white text-[#061B2E] border-b border-[#EBEBEB] px-0 py-1 placeholder:text-[12px] lg:placeholder:text-[16px]'
                   />
@@ -155,7 +181,9 @@ function FilterItem({ filter, openFilter, toggleFilter, filters, setFilters }: F
                   <input
                     type='number'
                     placeholder={`Enter Max ${filter.name}`}
-                    onChange={(e) => handleRangeChange('max', filter.name, e.target.value)}
+                    onChange={(e) =>
+                      handleRangeChange('max', filter.name, e.target.value)
+                    }
                     value={filters[`max_${apiKeyMap[filter.name]}`] ?? ''}
                     className='w-full placeholder:text-[12px] lg:placeholder:text-[16px] bg-white text-[#061B2E] border-b border-[#EBEBEB] px-0 py-1'
                   />
@@ -191,8 +219,11 @@ export default function Filters({ onFilterChange }: FiltersProps) {
   const [openFilter, setOpenFilter] = useState<string | null>(null);
   const [filters, setFilters] = useState<FiltersState>({});
 
-  const toggleFilter = (name: string | null) => setOpenFilter(openFilter === name ? null : name);
-  const hasAnyValue = Object.values(filters).some((v) => v !== undefined && v !== '');
+  const toggleFilter = (name: string | null) =>
+    setOpenFilter(openFilter === name ? null : name);
+  const hasAnyValue = Object.values(filters).some(
+    (v) => v !== undefined && v !== ''
+  );
 
   const applyFilters = () => onFilterChange?.(filters);
 
@@ -230,7 +261,11 @@ export default function Filters({ onFilterChange }: FiltersProps) {
             onFilterChange?.({});
           }}
           className={`px-3 py-0 lg:py-3 h-[32px] lg:h-[48px] font-normal leading-[28px] tracking-[0] text-white text-[12px] lg:text-[16px] transition
-            ${hasAnyValue ? 'bg-gray-600 rounded-[4px] cursor-pointer' : 'bg-gray-300 rounded-[4px] cursor-not-allowed'}`}
+            ${
+              hasAnyValue
+                ? 'bg-gray-600 rounded-[4px] cursor-pointer'
+                : 'bg-gray-300 rounded-[4px] cursor-not-allowed'
+            }`}
         >
           Reset
         </button>
@@ -238,7 +273,11 @@ export default function Filters({ onFilterChange }: FiltersProps) {
           disabled={!hasAnyValue}
           onClick={applyFilters}
           className={`px-5 py-0 lg:py-3 h-[32px] lg:h-[48px] font-normal leading-[28px] tracking-[0] text-white text-[12px] lg:text-[16px] transition
-            ${hasAnyValue ? 'bg-[#005F82] rounded-[4px] cursor-pointer' : 'bg-gray-400 rounded-[4px] cursor-not-allowed'}`}
+            ${
+              hasAnyValue
+                ? 'bg-[#005F82] rounded-[4px] cursor-pointer'
+                : 'bg-gray-400 rounded-[4px] cursor-not-allowed'
+            }`}
         >
           Apply
         </button>
