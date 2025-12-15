@@ -1,5 +1,6 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import downIcon from '../public/Image/icons/down.svg';
 import upIcon from '../public/Image/icons/up.svg';
@@ -17,18 +18,7 @@ const homeTypeMap: Record<string, string> = {
   Other: 'Other',
 };
 
-const homeTypes = [
-  'Single Family Residence',
-  'Townhouse',
-  'Apartment/Condo',
-  'Half Duplex',
-  'Manufactured Home',
-  'Manufactured On Land',
-  'Duplex',
-  'Quadruplex',
-  'Recreational',
-  'Other',
-];
+const homeTypes = Object.keys(homeTypeMap);
 
 type FilterType =
   | { name: string; type: 'range' }
@@ -47,6 +37,52 @@ interface FiltersState {
   [key: string]: number | string | undefined;
 }
 
+interface DropdownPortalProps {
+  anchorRef: React.RefObject<HTMLButtonElement | null>;
+  children: React.ReactNode;
+}
+
+function DropdownPortal({ anchorRef, children }: DropdownPortalProps) {
+  const [coords, setCoords] = useState({ top: 0, left: 0 });
+
+  useEffect(() => {
+    function updatePosition() {
+      if (!anchorRef.current) return;
+      const rect = anchorRef.current.getBoundingClientRect();
+      setCoords({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+      });
+    }
+
+    updatePosition();
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition, true);
+
+    return () => {
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition, true);
+    };
+  }, [anchorRef]);
+
+  if (!anchorRef.current) return null;
+
+  return createPortal(
+    <div
+      style={{
+        position: 'absolute',
+        top: coords.top,
+        left: coords.left,
+        zIndex: 9999,
+        minWidth: anchorRef.current.offsetWidth,
+      }}
+    >
+      {children}
+    </div>,
+    document.body
+  );
+}
+
 interface FilterItemProps {
   filter: FilterType;
   openFilter: string | null;
@@ -55,14 +91,9 @@ interface FilterItemProps {
   setFilters: (filters: FiltersState) => void;
 }
 
-function FilterItem({
-  filter,
-  openFilter,
-  toggleFilter,
-  filters,
-  setFilters,
-}: FilterItemProps) {
+function FilterItem({ filter, openFilter, toggleFilter, filters, setFilters }: FilterItemProps) {
   const isOpen = openFilter === filter.name;
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
 
   const apiKeyMap: Record<string, string> = {
     'Year Built': 'year_built',
@@ -72,18 +103,10 @@ function FilterItem({
     Price: 'price',
   };
 
-  const handleRangeChange = (
-    type: 'min' | 'max',
-    label: string,
-    value: string
-  ) => {
+  const handleRangeChange = (type: 'min' | 'max', label: string, value: string) => {
     const apiKey = apiKeyMap[label];
     if (!apiKey) return;
-
-    setFilters({
-      ...filters,
-      [`${type}_${apiKey}`]: value ? Number(value) : undefined,
-    });
+    setFilters({ ...filters, [`${type}_${apiKey}`]: value ? Number(value) : undefined });
   };
 
   const handleSelectChange = (value: string) => {
@@ -94,12 +117,11 @@ function FilterItem({
   return (
     <div className='relative'>
       <button
+        ref={buttonRef}
         className='flex items-center font-normal leading-[28px] tracking-[0] text-[12px] lg:text-[16px] gap-2 h-[32px] lg:h-[48px] px-3 py-2 bg-white text-[#061B2E] rounded-[4px] cursor-pointer'
         onClick={() => toggleFilter(filter.name)}
       >
-        {filter.type === 'select' && filters.property_type
-          ? filters.property_type
-          : filter.name}
+        {filter.type === 'select' && filters.property_type ? filters.property_type : filter.name}
         <Image
           src={isOpen ? upIcon : downIcon}
           alt={isOpen ? 'up arrow' : 'down arrow'}
@@ -109,58 +131,53 @@ function FilterItem({
         />
       </button>
 
-      {isOpen && (
-        <div className='absolute top-full left-0 mt-1 p-2 border rounded bg-white shadow-md w-56 max-h-60 overflow-y-auto z-50'>
-          {filter.type === 'range' && (
-            <div className='flex flex-col gap-3'>
-              <>
+      {isOpen && buttonRef.current && (
+        <DropdownPortal anchorRef={buttonRef}>
+          <div className='p-2 border rounded bg-white shadow-md w-56 max-h-60 overflow-y-auto'>
+            {filter.type === 'range' && (
+              <div className='flex flex-col gap-3'>
                 <div className='flex flex-col'>
-                  <label className='text-sm text-gray-700'>
-                    Min {filter.name} *
+                  <label className='text-[12px] lg:text-[16px] text-gray-700'>
+                    Min {filter.name}
                   </label>
                   <input
                     type='number'
                     placeholder={`Enter Min ${filter.name}`}
-                    onChange={(e) =>
-                      handleRangeChange('min', filter.name, e.target.value)
-                    }
+                    onChange={(e) => handleRangeChange('min', filter.name, e.target.value)}
                     value={filters[`min_${apiKeyMap[filter.name]}`] ?? ''}
-                    className='w-full bg-white text-[#061B2E] border-b border-[#EBEBEB] px-0 py-1'
+                    className='w-full bg-white text-[#061B2E] border-b border-[#EBEBEB] px-0 py-1 placeholder:text-[12px] lg:placeholder:text-[16px]'
                   />
                 </div>
-
                 <div className='flex flex-col'>
-                  <label className='text-sm text-gray-700'>
-                    Max {filter.name} *
+                  <label className='text-[12px] lg:text-[16px] text-gray-700'>
+                    Max {filter.name}
                   </label>
                   <input
                     type='number'
                     placeholder={`Enter Max ${filter.name}`}
-                    onChange={(e) =>
-                      handleRangeChange('max', filter.name, e.target.value)
-                    }
+                    onChange={(e) => handleRangeChange('max', filter.name, e.target.value)}
                     value={filters[`max_${apiKeyMap[filter.name]}`] ?? ''}
-                    className='w-full bg-white text-[#061B2E] border-b border-[#EBEBEB] px-0 py-1'
+                    className='w-full placeholder:text-[12px] lg:placeholder:text-[16px] bg-white text-[#061B2E] border-b border-[#EBEBEB] px-0 py-1'
                   />
                 </div>
-              </>
-            </div>
-          )}
+              </div>
+            )}
 
-          {filter.type === 'select' && (
-            <div className='flex flex-col gap-1'>
-              {homeTypes.map((label) => (
-                <div
-                  key={label}
-                  className='p-1 text-[#061B2E] font-normal hover:bg-gray-200 rounded cursor-pointer'
-                  onClick={() => handleSelectChange(homeTypeMap[label])}
-                >
-                  {label}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+            {filter.type === 'select' && (
+              <div className='flex flex-col gap-1'>
+                {homeTypes.map((label) => (
+                  <div
+                    key={label}
+                    className='p-1 text-[#061B2E] text-[12px] lg:text-[16px] font-normal hover:bg-gray-200 rounded cursor-pointer'
+                    onClick={() => handleSelectChange(homeTypeMap[label])}
+                  >
+                    {label}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </DropdownPortal>
       )}
     </div>
   );
@@ -174,20 +191,13 @@ export default function Filters({ onFilterChange }: FiltersProps) {
   const [openFilter, setOpenFilter] = useState<string | null>(null);
   const [filters, setFilters] = useState<FiltersState>({});
 
-  const toggleFilter = (name: string | null) => {
-    setOpenFilter(openFilter === name ? null : name);
-  };
+  const toggleFilter = (name: string | null) => setOpenFilter(openFilter === name ? null : name);
+  const hasAnyValue = Object.values(filters).some((v) => v !== undefined && v !== '');
 
-  const hasAnyValue = Object.values(filters).some(
-    (v) => v !== undefined && v !== ''
-  );
-
-  const applyFilters = () => {
-    if (onFilterChange) onFilterChange(filters);
-  };
+  const applyFilters = () => onFilterChange?.(filters);
 
   return (
-    <div className='w-full overflow-x-auto whitespace-nowrap flex-nowrap scrollbar-hide justify-between flex gap-1 rounded-[8px] p-5 mt-10 bg-[#4D4D4D]/10'>
+    <div className='w-full whitespace-nowrap flex-nowrap justify-between flex gap-1 rounded-[8px] p-5 mt-10 bg-[#4D4D4D]/10 overflow-x-auto lg:overflow-x-visible'>
       <div className='flex items-center gap-2 font-semibold'>
         <Image
           src='/Image/icons/setting-config.svg'
@@ -195,10 +205,10 @@ export default function Filters({ onFilterChange }: FiltersProps) {
           height={20}
           alt='filter icon'
         />
-        <p className='text-[12px] lg:text-[16px] font-normal leading-[28px] tracking-[0]  pr-1 text-[#4D4D4D]'>
+        <p className='text-[12px] lg:text-[16px] font-normal leading-[28px] tracking-[0] pr-1 text-[#4D4D4D]'>
           Filter
         </p>
-        <div className='flex gap-2 '>
+        <div className='flex gap-2 z-50'>
           {filtersData.map((filter) => (
             <FilterItem
               key={filter.name}
@@ -217,26 +227,18 @@ export default function Filters({ onFilterChange }: FiltersProps) {
           disabled={!hasAnyValue}
           onClick={() => {
             setFilters({});
-            if (onFilterChange) onFilterChange({});
+            onFilterChange?.({});
           }}
           className={`px-3 py-0 lg:py-3 h-[32px] lg:h-[48px] font-normal leading-[28px] tracking-[0] text-white text-[12px] lg:text-[16px] transition
-      ${
-        hasAnyValue
-          ? 'bg-gray-600 rounded-[4px] cursor-pointer'
-          : 'bg-gray-300 rounded-[4px] cursor-not-allowed'
-      }`}
+            ${hasAnyValue ? 'bg-gray-600 rounded-[4px] cursor-pointer' : 'bg-gray-300 rounded-[4px] cursor-not-allowed'}`}
         >
           Reset
         </button>
         <button
           disabled={!hasAnyValue}
           onClick={applyFilters}
-          className={`px-5 py-0 lg:py-3 h-[32px] text-[12px] lg:text-[16px] lg:h-[48px] font-normal leading-[28px] tracking-[0] text-white transition 
-      ${
-        hasAnyValue
-          ? 'bg-[#005F82] rounded-[4px] cursor-pointer'
-          : 'bg-gray-400 rounded-[4px] cursor-not-allowed'
-      }`}
+          className={`px-5 py-0 lg:py-3 h-[32px] lg:h-[48px] font-normal leading-[28px] tracking-[0] text-white text-[12px] lg:text-[16px] transition
+            ${hasAnyValue ? 'bg-[#005F82] rounded-[4px] cursor-pointer' : 'bg-gray-400 rounded-[4px] cursor-not-allowed'}`}
         >
           Apply
         </button>
