@@ -117,11 +117,14 @@ export default function PropertyDetail() {
       );
       window.parent.postMessage({ iframeHeight: height }, '*');
     };
-
     sendHeight();
     window.addEventListener('resize', sendHeight);
+    window.addEventListener('load', sendHeight);
 
-    return () => window.removeEventListener('resize', sendHeight);
+    return () => {
+      window.removeEventListener('resize', sendHeight);
+      window.removeEventListener('load', sendHeight);
+    };
   }, [property, loading]);
 
   if (loading) {
@@ -210,7 +213,7 @@ export default function PropertyDetail() {
           </div>
           <PropertyCards property={propertyData} />
 
-          <div className='flex w-fit flex-col'>
+          <div className='flex w-full flex-col'>
             <h2
               className='text-[26px] mb-10 leading-[100%] tracking-[0] font-semibold lg:text-[40px] '
               style={{
