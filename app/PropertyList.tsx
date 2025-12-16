@@ -189,7 +189,7 @@ export default function PropertyList({ initialData, filters }: Props) {
 
   return (
     <main className='flex min-h-screen bg-[#EBEBEB] py-6'>
-      <div className='max-w-[1200px] mx-auto'>
+      <div className='max-w-[1318px] mx-auto'>
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
           {properties.map((p) => (
             <PropertyCard
@@ -212,6 +212,8 @@ export default function PropertyList({ initialData, filters }: Props) {
 function PropertyCard({ property: p, tableCols }: CardProps) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
+  const [isOverflow, setIsOverflow] = useState(false);
 
   const menuItems = [
     'View Photos',
@@ -231,26 +233,51 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    const el = titleRef.current;
+    if (!el) return;
+    setIsOverflow(el.scrollHeight > el.clientHeight);
+  }, [
+    p.StreetNumber,
+    p.StreetName,
+    p.StreetSuffix,
+    p.City,
+    p.SubdivisionName,
+    p.PropertySubType,
+    p.BCRES_SaleOrRent,
+  ]);
+
   return (
-    <div className='group bg-white rounded-[8px] shadow-sm  hover:shadow-md transition w-[328px] h-fit sm:w-[384px] p-[12px]'>
+    <div className='group bg-white rounded-[8px] shadow-sm  hover:shadow-md transition lg:w-[100%] h-fit w-full p-[12px]'>
       <Link
         href={`${process.env.NEXT_PUBLIC_LISTING_URL}?ListingKey=${p.ListingKey}`}
       >
-        <div className='pb-4 leading-[28px] min-h-[100px]'>
-          <p
-            className='text-[#061b2e] font-medium
-          leading-[28px] tracking-[0px] text-[18px]'
-            style={{ fontFamily: 'Red Hat Display' }}
-          >
+        <div
+          ref={titleRef}
+          className='
+      relative
+      overflow-hidden
+      leading-[28px]
+      text-[#061b2e]
+      font-medium
+      text-[18px]
+      max-h-[84px]
+      min-h-[84px]
+    '
+          style={{ fontFamily: 'Red Hat Display' }}
+        >
+          <p>
             {p.StreetNumber} {p.StreetName} {p.StreetSuffix} in {p.City}
           </p>
-          <p
-            className='text-[#061b2e] font-medium
-          leading-[28px] tracking-[0px] text-[18px]'
-          >
+
+          <p>
             {p.SubdivisionName} {p.PropertySubType} {p.BCRES_SaleOrRent} in{' '}
             {p.SubdivisionName}: MLS®#
           </p>
+
+          {isOverflow && (
+            <span className='absolute bottom-0 right-0 bg-white pl-1'>…</span>
+          )}
         </div>
       </Link>
       <div className='relative w-full h-60 overflow-hidden rounded-[4px]'>
@@ -281,7 +308,7 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
         )}
 
         <div className='absolute top-2 right-2 flex items-center gap-2 z-30'>
-          <button className='bg-[#00AD62]/50 border border-[#00AD62] text-white px-3 rounded-t-[12px] rounded-b-[16.5px] w-[55px] h-[24px] text-sm hover:bg-[#0294cc] transition'>
+          <button className='bg-[#00AD62]/50 border border-[#00AD62] text-white px-3 rounded-t-[12px] rounded-b-[16.5px] w-[55px] h-[24px] text-sm hover:bg-[#0294cc] transition  backdrop-blur-[8px]'>
             <p
               className='text-[12px] font-semibold  leading-[100%] tracking-[0]
               '
@@ -365,9 +392,7 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
       </div>
 
       <div className='flex mt-6 justify-between items-center overflow-visible'>
-        <Link
-          href={`${process.env.NEXT_PUBLIC_LISTING_URL}?ListingKey=${p.ListingKey}`}
-        >
+        <Link href={`/properties/photos/${p.ListingKey}`}>
           <button className='bg-[#005F82]  cursor-pointer  rounded-[4px] px-5 py-2'>
             <p className='leading-[28px] tracking-[0] font-medium text-white text-[14px]'>
               Details

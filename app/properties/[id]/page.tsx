@@ -104,6 +104,21 @@ export default function PropertyDetail() {
     if (id) fetchProperty();
   }, [id]);
 
+
+useEffect(() => {
+  const sendHeight = () => {
+    const height = document.body.scrollHeight;
+    window.parent.postMessage({ iframeHeight: height }, '*');
+  };
+
+  sendHeight(); 
+  window.addEventListener('resize', sendHeight); 
+
+  return () => window.removeEventListener('resize', sendHeight);
+}, []);
+
+
+
   if (loading) {
     return (
       <div className='flex justify-center items-center min-h-screen'>

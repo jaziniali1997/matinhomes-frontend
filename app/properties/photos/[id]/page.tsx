@@ -95,10 +95,10 @@ export default function PropertyDetail() {
 
   return (
     <main className='bg-[#EBEBEB] min-h-screen '>
-      <div className='max-w-[1318px] mx-auto rounded-lg'>
+      <div className='max-w-[1318px] mx-auto rounded-[8px]'>
         <div className='flex flex-col sm:flex-row gap-4 justify-center items-center'>
           <div
-            className='relative w-[328px] h-[217px] lg:w-[900px] lg:h-[523px] rounded-lg overflow-hidden cursor-pointer'
+            className='relative w-full h-[217px] lg:w-[65%] lg:h-[523px] rounded-lg overflow-hidden cursor-pointer'
             onClick={() => {
               setCurrent(0);
               setShowGallery(true);
@@ -134,9 +134,9 @@ export default function PropertyDetail() {
             </div>
           </div>
 
-          <div className='flex-col gap-4 hidden md:flex'>
+          <div className='flex-col  lg:w-[35%] gap-4 hidden md:flex'>
             <div
-              className='relative w-[386px] h-[251px] rounded-[8px] overflow-hidden cursor-pointer'
+              className='relative  h-[252px] rounded-[8px] overflow-hidden cursor-pointer'
               onClick={() => {
                 setCurrent(1);
                 setShowGallery(true);
@@ -153,7 +153,7 @@ export default function PropertyDetail() {
             </div>
 
             <div
-              className='relative w-[386px] h-[251px] rounded-[8px] overflow-hidden cursor-pointer'
+              className='relative  h-[251px] rounded-[8px] overflow-hidden cursor-pointer'
               onClick={() => {
                 setCurrent(2);
                 setShowGallery(true);
