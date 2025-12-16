@@ -104,22 +104,25 @@ export default function PropertyDetail() {
     if (id) fetchProperty();
   }, [id]);
 
+  useEffect(() => {
+    const sendHeight = () => {
+      const body = document.body;
+      const html = document.documentElement;
+      const height = Math.max(
+        body.scrollHeight,
+        body.offsetHeight,
+        html.clientHeight,
+        html.scrollHeight,
+        html.offsetHeight
+      );
+      window.parent.postMessage({ iframeHeight: height }, '*');
+    };
 
+    sendHeight();
+    window.addEventListener('resize', sendHeight);
 
-useEffect(() => {
-  const sendHeight = () => {
-    const height = document.body.scrollHeight;
-    window.parent.postMessage({ iframeHeight: height }, '*');
-  };
-
-  sendHeight(); 
-  window.addEventListener('resize', sendHeight);
-
-  return () => window.removeEventListener('resize', sendHeight);
-}, [property, loading]);
-
-
-
+    return () => window.removeEventListener('resize', sendHeight);
+  }, [property, loading]);
 
   if (loading) {
     return (
@@ -133,7 +136,7 @@ useEffect(() => {
     return <p className='text-center h-[20vh] mt-10'>Property not found.</p>;
 
   return (
-    <main className='bg-[#EBEBEB] min-h-screen'>
+    <main className='bg-[#EBEBEB] min-h-0'>
       <div className='md:max-w-[1318px] mx-auto rounded-lg'>
         <div className='max-w-[768px]'>
           <div className=' '>
@@ -154,7 +157,7 @@ useEffect(() => {
                 </p>
               </span>
 
-              <span className='bg-[#fff] flex items-center w-fit h-[32px] px-2 py-1 rounded-lg'>
+              <span className='bg-[#fff] flex items-center w-fit h-[32px] px-2 py-1 rounded-[4px]'>
                 <Image
                   src='/Image/icons/single-bed.svg'
                   alt='Bed icon'
@@ -167,7 +170,7 @@ useEffect(() => {
                 </p>
               </span>
 
-              <span className='bg-[#fff] flex items-center w-fit h-[32px] px-2 py-1 rounded-lg'>
+              <span className='bg-[#fff] flex items-center w-fit h-[32px] px-2 py-1 rounded-[4px]'>
                 <Image
                   src='/Image/icons/shower-head.svg'
                   alt='Shower icon'
