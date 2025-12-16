@@ -109,8 +109,7 @@ export default function PropertyList({ initialData, filters }: Props) {
   ];
 
   const fetchMore = useCallback(async () => {
-    if (loading || !hasMore) return;
-
+    if (!hasMore) return;
     setLoading(true);
 
     try {
@@ -188,7 +187,7 @@ export default function PropertyList({ initialData, filters }: Props) {
   }, [fetchMore]);
 
   return (
-    <main className='flex min-h-screen bg-[#EBEBEB] py-6'>
+    <main className='flex  bg-[#EBEBEB] py-6'>
       <div className='max-w-[1318px] mx-auto'>
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
           {properties.map((p) => (

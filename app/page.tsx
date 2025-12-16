@@ -169,10 +169,11 @@ export default function Home() {
         });
       }
     };
-
+  
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [filters, page, loadingMore, hasMore, fetchProperties]);
+  
 
   return (
     <div className='w-full lg:w-[1318px] flex justify-center flex-col mx-auto'>
