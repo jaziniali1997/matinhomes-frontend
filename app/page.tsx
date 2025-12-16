@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import PropertyList from './PropertyList';
 import FilterData from '../components/FilterData';
 
@@ -61,13 +61,22 @@ export interface Property {
 export default function Home() {
   const [filters, setFilters] = useState<FiltersState>({});
   const [properties, setProperties] = useState<Property[]>([]);
-  const [page, setPage] = useState<number>(1);
-  const [hasMore, setHasMore] = useState<boolean>(true);
-  const [loadingInitial, setLoadingInitial] = useState<boolean>(false);
-  const [loadingMore, setLoadingMore] = useState<boolean>(false);
+  const [loadingInitial, setLoadingInitial] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+
+  const pageRef = useRef(1);
+  const isFetchingRef = useRef(false);
+  const fetchedPages = useRef<Set<number>>(new Set());
 
   const fetchProperties = useCallback(
     async (filters: FiltersState, pageNum: number, append = false) => {
+      if (isFetchingRef.current) return; 
+      if (fetchedPages.current.has(pageNum)) return;
+      if (!hasMore && append) return;
+
+      isFetchingRef.current = true;
+
       try {
         if (pageNum === 1) setLoadingInitial(true);
         else setLoadingMore(true);
@@ -87,7 +96,7 @@ export default function Home() {
             ? `${_url}properties/`
             : `${_url}properties/?${params.toString()}`;
 
-        console.log('REQUEST →', url);
+        console.log('FETCH →', url);
 
         const res = await fetch(url, { cache: 'no-store' });
         const text = await res.text();
@@ -95,8 +104,7 @@ export default function Home() {
         let dataRaw: RawProperty[] = [];
         try {
           dataRaw = JSON.parse(text);
-        } catch (_err) {
-          console.error(_err);
+        } catch {
           console.error('Response was NOT JSON!');
         }
 
@@ -123,63 +131,61 @@ export default function Home() {
           YearBuilt: null,
           Media:
             Array.isArray(p.Media) && p.Media.length > 0
-              ? p.Media.map((m, index) => ({
+              ? p.Media.map((m, idx) => ({
                   MediaURL: `${m.MediaURL}${m.MediaName}`,
-                  Order: index + 1,
+                  Order: idx + 1,
                 }))
               : [{ MediaURL: '/Image/default.jpg', Order: 1 }],
           MediaName: '',
         }));
 
-        if (append) setProperties((prev) => [...prev, ...mapped]);
-        else setProperties(mapped);
+        setProperties((prev) => {
+          const existingKeys = new Set(prev.map((p) => p.ListingKey));
+          const newProps = mapped.filter((p) => !existingKeys.has(p.ListingKey));
+          return append ? [...prev, ...newProps] : newProps;
+        });
 
+        fetchedPages.current.add(pageNum);
+        pageRef.current = pageNum;
         setHasMore(mapped.length === 12);
-      } catch (_err) {
-        console.error(_err);
+      } catch (err) {
+        console.error(err);
         setHasMore(false);
       } finally {
+        isFetchingRef.current = false;
         setLoadingInitial(false);
         setLoadingMore(false);
       }
     },
-    []
+    [filters, hasMore]
   );
 
   useEffect(() => {
-    const resetAndFetch = async () => {
-      setPage(1);
-      setProperties([]);
-      setHasMore(true);
-      await fetchProperties(filters, 1, false);
-    };
-    resetAndFetch();
+    pageRef.current = 1;
+    fetchedPages.current.clear();
+    setProperties([]);
+    setHasMore(true);
+    fetchProperties(filters, 1, false);
   }, [filters, fetchProperties]);
 
   useEffect(() => {
     const handleScroll = () => {
       if (
-        window.innerHeight + window.scrollY >=
-          document.body.offsetHeight - 200 &&
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 &&
         !loadingMore &&
+        !isFetchingRef.current &&
         hasMore
       ) {
-        fetchProperties(filters, page + 1, true).then(() => {
-          setPage((prev) => prev + 1);
-        });
+        fetchProperties(filters, pageRef.current + 1, true);
       }
     };
-  
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [filters, page, loadingMore, hasMore, fetchProperties]);
-  
+  }, [filters, loadingMore, hasMore, fetchProperties]);
 
   return (
     <div className='w-full lg:w-[1318px] flex justify-center flex-col mx-auto'>
-      <FilterData
-        onFilterChange={(newFilters: FiltersState) => setFilters(newFilters)}
-      />
+      <FilterData onFilterChange={(newFilters) => setFilters(newFilters)} />
 
       {loadingInitial && properties.length === 0 && (
         <p className='text-center py-4'>Loading...</p>
@@ -193,6 +199,12 @@ export default function Home() {
 
       {properties.length > 0 && (
         <PropertyList initialData={properties} filters={filters} />
+      )}
+
+      {loadingMore && (
+        <div className='text-center py-4'>
+          <div className='w-8 h-8 border-4 border-gray-300 border-t-[#005F82] rounded-full animate-spin mx-auto'></div>
+        </div>
       )}
     </div>
   );
