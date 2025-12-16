@@ -157,7 +157,7 @@ export default function Home() {
         setLoadingMore(false);
       }
     },
-    [filters, hasMore]
+    [hasMore]
   );
 
   useEffect(() => {
