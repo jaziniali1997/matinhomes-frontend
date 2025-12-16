@@ -105,6 +105,7 @@ export default function PropertyDetail() {
   }, [id]);
 
 
+
 useEffect(() => {
   const sendHeight = () => {
     const height = document.body.scrollHeight;
@@ -112,10 +113,11 @@ useEffect(() => {
   };
 
   sendHeight(); 
-  window.addEventListener('resize', sendHeight); 
+  window.addEventListener('resize', sendHeight);
 
   return () => window.removeEventListener('resize', sendHeight);
-}, []);
+}, [property, loading]);
+
 
 
 
