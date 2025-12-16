@@ -257,7 +257,9 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
       </div>
 
       <div className='flex mt-6 justify-between items-center overflow-visible'>
-        <Link href={`/properties/photos/${p.ListingKey}`}>
+        <Link
+          href={`${process.env.NEXT_PUBLIC_LISTING_URL}?ListingKey=${p.ListingKey}`}
+        >
           <button className='bg-[#005F82] cursor-pointer rounded-[4px] px-5 py-2'>
             <p className='leading-[28px] tracking-[0] font-medium text-white text-[14px]'>
               Details
