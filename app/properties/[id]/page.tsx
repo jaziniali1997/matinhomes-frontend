@@ -104,29 +104,29 @@ export default function PropertyDetail() {
     if (id) fetchProperty();
   }, [id]);
 
+  const sendHeight = () => {
+    const body = document.body;
+    const html = document.documentElement;
+    const height = Math.max(
+      body.scrollHeight,
+      body.offsetHeight,
+      html.clientHeight,
+      html.scrollHeight,
+      html.offsetHeight
+    );
+    window.parent.postMessage({ iframeHeight: height }, '*');
+  };
+
   useEffect(() => {
-    const sendHeight = () => {
-      const body = document.body;
-      const html = document.documentElement;
-      const height = Math.max(
-        body.scrollHeight,
-        body.offsetHeight,
-        html.clientHeight,
-        html.scrollHeight,
-        html.offsetHeight
-      );
-      window.parent.postMessage({ iframeHeight: height }, '*');
-    };
-    sendHeight();
+    sendHeight(); 
+    const interval = setInterval(sendHeight, 500);
     window.addEventListener('resize', sendHeight);
-    window.addEventListener('load', sendHeight);
 
     return () => {
+      clearInterval(interval);
       window.removeEventListener('resize', sendHeight);
-      window.removeEventListener('load', sendHeight);
     };
   }, [property, loading]);
-
   if (loading) {
     return (
       <div className='flex justify-center items-center min-h-screen'>
@@ -139,7 +139,7 @@ export default function PropertyDetail() {
     return <p className='text-center h-[20vh] mt-10'>Property not found.</p>;
 
   return (
-    <main className='bg-[#EBEBEB] min-h-0'>
+    <main className='bg-[#EBEBEB]'>
       <div className='md:max-w-[1318px] mx-auto rounded-lg'>
         <div className='max-w-[768px]'>
           <div className=' '>
