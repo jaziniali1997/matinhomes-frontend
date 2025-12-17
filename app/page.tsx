@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import PropertyList from './PropertyList';
 import FilterData from '../components/FilterData';
+import { useSearchParams } from 'next/navigation';
 
 const _url = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -64,6 +65,8 @@ export default function Home() {
   const [loadingInitial, setLoadingInitial] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const searchParams = useSearchParams();
+  const cityFromUrl = searchParams.get('city');
 
   const pageRef = useRef(1);
   const isFetchingRef = useRef(false);
@@ -71,7 +74,7 @@ export default function Home() {
 
   const fetchProperties = useCallback(
     async (filters: FiltersState, pageNum: number, append = false) => {
-      if (isFetchingRef.current) return; 
+      if (isFetchingRef.current) return;
       if (fetchedPages.current.has(pageNum)) return;
       if (!hasMore && append) return;
 
@@ -91,12 +94,21 @@ export default function Home() {
           }
         });
 
-        const url =
-          pageNum === 1 && Object.keys(filters).length === 0
-            ? `${_url}properties/`
-            : `${_url}properties/?${params.toString()}`;
+        const baseUrl = `${_url}properties/`;
+        const queryParts: string[] = [];
 
-        console.log('FETCH →', url);
+        if (cityFromUrl) {
+          queryParts.push(`city=${encodeURIComponent(cityFromUrl)}`);
+        }
+
+        if (params.toString()) {
+          queryParts.push(params.toString());
+        }
+
+        const url =
+          queryParts.length > 0
+            ? `${baseUrl}?${queryParts.join('&')}`
+            : baseUrl;
 
         const res = await fetch(url, { cache: 'no-store' });
         const text = await res.text();
@@ -141,7 +153,9 @@ export default function Home() {
 
         setProperties((prev) => {
           const existingKeys = new Set(prev.map((p) => p.ListingKey));
-          const newProps = mapped.filter((p) => !existingKeys.has(p.ListingKey));
+          const newProps = mapped.filter(
+            (p) => !existingKeys.has(p.ListingKey)
+          );
           return append ? [...prev, ...newProps] : newProps;
         });
 
@@ -171,7 +185,8 @@ export default function Home() {
   useEffect(() => {
     const handleScroll = () => {
       if (
-        window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 &&
+        window.innerHeight + window.scrollY >=
+          document.body.offsetHeight - 500 &&
         !loadingMore &&
         !isFetchingRef.current &&
         hasMore
