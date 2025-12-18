@@ -228,7 +228,7 @@ export default function Filters({ onFilterChange }: FiltersProps) {
   const applyFilters = () => onFilterChange?.(filters);
 
   return (
-    <div className='w-full whitespace-nowrap flex-nowrap justify-between flex gap-1 rounded-[8px] p-5 mt-10 bg-[#4D4D4D]/10 overflow-x-auto lg:overflow-x-visible'>
+    <div className='w-full whitespace-nowrap flex-nowrap justify-between flex gap-1 rounded-[8px] p-5 bg-[#4D4D4D]/10 overflow-x-auto lg:overflow-x-visible'>
       <div className='flex items-center gap-2 font-semibold'>
         <Image
           src='/Image/icons/setting-config.svg'
