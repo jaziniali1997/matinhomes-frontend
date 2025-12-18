@@ -63,7 +63,6 @@ export default function HomeClient() {
   const [filters, setFilters] = useState<FiltersState>({});
   const [properties, setProperties] = useState<Property[]>([]);
   const [loadingInitial, setLoadingInitial] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
   const searchParams = useSearchParams();
   const cityFromUrl = searchParams.get('city');
   const [currentPage, setCurrentPage] = useState(1);
@@ -158,16 +157,14 @@ export default function HomeClient() {
 
         fetchedPages.current.add(pageNum);
         pageRef.current = pageNum;
-        setHasMore(mapped.length === 12);
       } catch (err) {
         console.error(err);
-        setHasMore(false);
       } finally {
         isFetchingRef.current = false;
         setLoadingInitial(false);
       }
     },
-    [hasMore, cityFromUrl]
+    [cityFromUrl]
   );
 
   useEffect(() => {
@@ -175,16 +172,15 @@ export default function HomeClient() {
       initialFetchDone.current = true;
       fetchProperties(filters, 1, false);
     }
-  }, []);
+  }, [fetchProperties, filters]);
   useEffect(() => {
     pageRef.current = 1;
     fetchedPages.current.clear();
     setProperties([]);
-    setHasMore(true);
     setCurrentPage(1);
 
     fetchProperties(filters, 1, false);
-  }, [filters]);
+  }, [fetchProperties, filters]);
 
   useEffect(() => {
     const sendHeight = () => {
@@ -204,6 +200,7 @@ export default function HomeClient() {
     const interval = setInterval(sendHeight, 500);
 
     window.addEventListener('resize', sendHeight);
+
     return () => {
       clearInterval(interval);
       window.removeEventListener('resize', sendHeight);
