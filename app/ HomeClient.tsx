@@ -63,10 +63,12 @@ export default function HomeClient() {
   const [filters, setFilters] = useState<FiltersState>({});
   const [properties, setProperties] = useState<Property[]>([]);
   const [loadingInitial, setLoadingInitial] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const searchParams = useSearchParams();
   const cityFromUrl = searchParams.get('city');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const initialFetchDone = useRef(false);
 
   const pageRef = useRef(1);
   const isFetchingRef = useRef(false);
@@ -76,13 +78,11 @@ export default function HomeClient() {
     async (filters: FiltersState, pageNum: number, append = false) => {
       if (isFetchingRef.current) return;
       if (fetchedPages.current.has(pageNum)) return;
-      if (!hasMore && append) return;
 
       isFetchingRef.current = true;
 
       try {
         if (pageNum === 1) setLoadingInitial(true);
-        else setLoadingMore(true);
 
         const params = new URLSearchParams();
         params.append('page', String(pageNum));
@@ -111,15 +111,12 @@ export default function HomeClient() {
             : baseUrl;
 
         const res = await fetch(url, { cache: 'no-store' });
-        const text = await res.text();
-
-        let dataRaw: RawProperty[] = [];
-        try {
-          dataRaw = JSON.parse(text);
-        } catch {
-          console.error('Response was NOT JSON!');
-        }
-
+        const json = await res.json();
+        const dataRaw: RawProperty[] = Array.isArray(json?.Data)
+          ? json.Data
+          : [];
+        setTotalPages(json?.TotalPages ?? 1);
+        setCurrentPage(json?.CurrentPage ?? pageNum);
         const mapped: Property[] = dataRaw.map((p) => ({
           ListingKey: p.ListingKey,
           NewListing: p.NewListing,
@@ -168,35 +165,135 @@ export default function HomeClient() {
       } finally {
         isFetchingRef.current = false;
         setLoadingInitial(false);
-        setLoadingMore(false);
       }
     },
     [hasMore, cityFromUrl]
   );
 
   useEffect(() => {
+    if (!initialFetchDone.current) {
+      initialFetchDone.current = true;
+      fetchProperties(filters, 1, false);
+    }
+  }, []);
+  useEffect(() => {
     pageRef.current = 1;
     fetchedPages.current.clear();
     setProperties([]);
     setHasMore(true);
-    fetchProperties(filters, 1, false);
-  }, [filters, fetchProperties]);
+    setCurrentPage(1);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (
-        window.innerHeight + window.scrollY >=
-          document.body.offsetHeight - 500 &&
-        !loadingMore &&
-        !isFetchingRef.current &&
-        hasMore
-      ) {
-        fetchProperties(filters, pageRef.current + 1, true);
-      }
+    fetchProperties(filters, 1, false);
+  }, [filters]);
+
+  const renderPagination = () => {
+    if (totalPages <= 1 || properties.length === 0) return null;
+
+    const maxVisible = window.innerWidth <= 768 ? 5 : 10;
+
+    let start = Math.floor((currentPage - 1) / maxVisible) * maxVisible + 1;
+    let end = Math.min(start + maxVisible - 1, totalPages);
+
+    if (currentPage > totalPages - maxVisible) {
+      start = Math.max(totalPages - maxVisible + 1, 1);
+      end = totalPages;
+    }
+
+    const goPrevBlock = () => {
+      const target = Math.max(currentPage - maxVisible, 1);
+      fetchedPages.current.clear();
+      fetchProperties(filters, target, false);
+      setCurrentPage(target);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [filters, loadingMore, hasMore, fetchProperties]);
+
+    const goNextBlock = () => {
+      const target = Math.min(currentPage + maxVisible, totalPages);
+      fetchedPages.current.clear();
+      fetchProperties(filters, target, false);
+      setCurrentPage(target);
+    };
+
+    return (
+      <div className='flex justify-center items-center gap-2 mt-10'>
+        <button
+          disabled={currentPage === 1}
+          onClick={goPrevBlock}
+          className='px-1 lg:px-3 py-1 border text-[12px] lg:text-[16px] text-gray-800 rounded disabled:opacity-40'
+        >
+          Prev
+        </button>
+
+        {start > 1 && (
+  <>
+    <button
+      onClick={() => {
+        fetchedPages.current.clear();
+        fetchProperties(filters, 1, false);
+        setCurrentPage(1);
+      }}
+      className={`hidden lg:inline px-2 lg:px-3 py-1 text-[12px] lg:text-[16px] border text-black rounded ${
+        currentPage === 1
+          ? 'bg-[#005F82] text-white'
+          : 'bg-[#7c7777]/20 hover:bg-[#005F82]'
+      }`}
+    >
+      1
+    </button>
+    <span className='hidden lg:inline px-1 lg:px-2 text-gray-500'>...</span>
+  </>
+)}
+
+
+        {Array.from({ length: end - start + 1 }, (_, i) => start + i).map(
+          (page) => (
+            <button
+              key={page}
+              onClick={() => {
+                fetchedPages.current.clear();
+                fetchProperties(filters, page, false);
+                setCurrentPage(page);
+              }}
+              className={`px-2 lg:px-3 py-1 text-[12px] lg:text-[16px] border text-black rounded ${
+                page === currentPage
+                  ? 'bg-[#005F82] text-white'
+                  : 'bg-[#7c7777]/20 hover:bg-[#005F82]'
+              }`}
+            >
+              {page}
+            </button>
+          )
+        )}
+
+        {end < totalPages && (
+          <>
+            <span className='px-2 lg:px-2 text-gray-500'>...</span>
+            <button
+              onClick={() => {
+                fetchedPages.current.clear();
+                fetchProperties(filters, totalPages, false);
+                setCurrentPage(totalPages);
+              }}
+              className={`px-1 lg:px-3 text-[12px] lg:text-[16px] py-1 border rounded ${
+                currentPage === totalPages
+                  ? 'bg-[#005F82] text-white'
+                  : 'bg-[#7c7777]/20 text-black hover:bg-[#005F82]'
+              }`}
+            >
+              {totalPages}
+            </button>
+          </>
+        )}
+
+        <button
+          disabled={currentPage === totalPages}
+          onClick={goNextBlock}
+          className='px-3 py-1 border text-[12px] lg:text-[16px] text-gray-800 rounded disabled:opacity-40'
+        >
+          Next
+        </button>
+      </div>
+    );
+  };
 
   return (
     <div className='w-full lg:w-[1318px] flex justify-center flex-col mx-auto'>
@@ -207,19 +304,16 @@ export default function HomeClient() {
       )}
 
       {!loadingInitial && properties.length === 0 && (
-        <p className='text-center h-full py-8 text-gray-600 text-lg'>
+        <p className='text-center  h-[20vh] py-8 text-gray-600 text-lg'>
           No listings found based on your filters.
         </p>
       )}
 
       {properties.length > 0 && (
-        <PropertyList initialData={properties} filters={filters} />
-      )}
-
-      {loadingMore && (
-        <div className='text-center py-4'>
-          <div className='w-8 h-8 border-4 border-gray-300 border-t-[#005F82] rounded-full animate-spin mx-auto'></div>
-        </div>
+        <>
+          <PropertyList initialData={properties} filters={filters} />
+          {renderPagination()}
+        </>
       )}
     </div>
   );

@@ -151,7 +151,7 @@ function FilterItem({
           alt={isOpen ? 'up arrow' : 'down arrow'}
           width={12}
           height={12}
-          className='ml-2 lg:ml-6'
+          className='ml-4 mr-2 lg:mr-0 lg:ml-6'
         />
       </button>
 
@@ -260,26 +260,30 @@ export default function Filters({ onFilterChange }: FiltersProps) {
             setFilters({});
             onFilterChange?.({});
           }}
-          className={`px-3 py-0 lg:py-3 h-[32px] lg:h-[48px] font-normal leading-[28px] tracking-[0] text-white text-[12px] lg:text-[16px] transition
+          className={`px-3 flex items-center h-[32px] lg:h-[48px] font-normal leading-[28px] tracking-[0] text-white text-[12px] lg:text-[16px] transition
             ${
               hasAnyValue
-                ? 'bg-gray-600 rounded-[4px] cursor-pointer'
-                : 'bg-gray-300 rounded-[4px] cursor-not-allowed'
+                ? 'bg-gray-800 rounded-[4px] cursor-pointer'
+                : 'bg-gray-400 rounded-[4px] cursor-not-allowed'
             }`}
         >
+          <p>
           Reset
+          </p>
         </button>
         <button
           disabled={!hasAnyValue}
           onClick={applyFilters}
-          className={`px-5 py-0 lg:py-3 h-[32px] lg:h-[48px] font-normal leading-[28px] tracking-[0] text-white text-[12px] lg:text-[16px] transition
+          className={`px-5 flex items-center  h-[32px] lg:h-[48px] font-normal leading-[28px] tracking-[0]  text-[12px] lg:text-[16px] transition
             ${
               hasAnyValue
-                ? 'bg-[#005F82] rounded-[4px] cursor-pointer'
-                : 'bg-gray-400 rounded-[4px] cursor-not-allowed'
+                ? ' rounded-[4px] bg-[#005F82] text-white cursor-pointer'
+                : 'border-[#005F82] border border-3 text-[#005F82] rounded-[4px] cursor-not-allowed'
             }`}
         >
+          <p>
           Apply
+          </p>
         </button>
       </div>
     </div>
