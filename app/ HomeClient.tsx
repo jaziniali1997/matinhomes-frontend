@@ -186,6 +186,30 @@ export default function HomeClient() {
     fetchProperties(filters, 1, false);
   }, [filters]);
 
+  useEffect(() => {
+    const sendHeight = () => {
+      const body = document.body;
+      const html = document.documentElement;
+      const height = Math.max(
+        body.scrollHeight,
+        body.offsetHeight,
+        html.clientHeight,
+        html.scrollHeight,
+        html.offsetHeight
+      );
+      window.parent.postMessage({ iframeHeight: height }, '*');
+    };
+
+    sendHeight();
+    const interval = setInterval(sendHeight, 500);
+
+    window.addEventListener('resize', sendHeight);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('resize', sendHeight);
+    };
+  }, [properties, loadingInitial]);
+
   const renderPagination = () => {
     if (totalPages <= 1 || properties.length === 0) return null;
 
@@ -224,25 +248,26 @@ export default function HomeClient() {
         </button>
 
         {start > 1 && (
-  <>
-    <button
-      onClick={() => {
-        fetchedPages.current.clear();
-        fetchProperties(filters, 1, false);
-        setCurrentPage(1);
-      }}
-      className={`hidden lg:inline px-2 lg:px-3 py-1 text-[12px] lg:text-[16px] border text-black rounded ${
-        currentPage === 1
-          ? 'bg-[#005F82] text-white'
-          : 'bg-[#7c7777]/20 hover:bg-[#005F82]'
-      }`}
-    >
-      1
-    </button>
-    <span className='hidden lg:inline px-1 lg:px-2 text-gray-500'>...</span>
-  </>
-)}
-
+          <>
+            <button
+              onClick={() => {
+                fetchedPages.current.clear();
+                fetchProperties(filters, 1, false);
+                setCurrentPage(1);
+              }}
+              className={`hidden lg:inline px-2 lg:px-3 py-1 text-[12px] lg:text-[16px] border text-black rounded ${
+                currentPage === 1
+                  ? 'bg-[#005F82] text-white'
+                  : 'bg-[#7c7777]/20 hover:bg-[#005F82]'
+              }`}
+            >
+              1
+            </button>
+            <span className='hidden lg:inline px-1 lg:px-2 text-gray-500'>
+              ...
+            </span>
+          </>
+        )}
 
         {Array.from({ length: end - start + 1 }, (_, i) => start + i).map(
           (page) => (
