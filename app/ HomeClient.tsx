@@ -14,6 +14,7 @@ export interface FiltersState {
 export interface RawProperty {
   ListingKey: string;
   NewListing: boolean;
+  Open: boolean;
   Data?: {
     MlsStatus?: string;
     StreetNumber?: string;
@@ -23,6 +24,7 @@ export interface RawProperty {
     SubdivisionName?: string;
     PropertySubType?: string;
     BCRES_SaleOrRent?: string;
+    UnitNumber?: string;
     ListingId?: string;
     BathroomsTotalInteger?: number;
     BuildingAreaTotal?: number;
@@ -38,8 +40,10 @@ export interface Property {
   ListingKey: string;
   StreetNumber: string;
   StreetName: string;
+  UnitNumber: string;
   StreetSuffix: string;
   City: string;
+  Open: boolean;
   SubdivisionName: string;
   PropertySubType: string;
   BCRES_SaleOrRent: string;
@@ -65,6 +69,8 @@ export default function HomeClient() {
   const [loadingInitial, setLoadingInitial] = useState(false);
   const searchParams = useSearchParams();
   const cityFromUrl = searchParams.get('city');
+  const foreclosureFromUrl = searchParams.get('foreclosure');
+  const filtersFromUrl = searchParams.get('filters');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const initialFetchDone = useRef(false);
@@ -95,15 +101,21 @@ export default function HomeClient() {
 
         const baseUrl = `${_url}properties/`;
         const queryParts: string[] = [];
-
         if (cityFromUrl) {
           queryParts.push(`city=${encodeURIComponent(cityFromUrl)}`);
+        }
+
+        if (foreclosureFromUrl !== null) {
+          queryParts.push(`foreclosure=${foreclosureFromUrl}`);
+        }
+
+        if (filtersFromUrl) {
+          queryParts.push(`filters=${encodeURIComponent(filtersFromUrl)}`);
         }
 
         if (params.toString()) {
           queryParts.push(params.toString());
         }
-
         const url =
           queryParts.length > 0
             ? `${baseUrl}?${queryParts.join('&')}`
@@ -119,11 +131,13 @@ export default function HomeClient() {
         const mapped: Property[] = dataRaw.map((p) => ({
           ListingKey: p.ListingKey,
           NewListing: p.NewListing,
+          Open: p.Open,
           MlsStatus: p.Data?.MlsStatus ?? '',
           StreetNumber: p.Data?.StreetNumber ?? '',
           StreetName: p.Data?.StreetName ?? '',
           StreetSuffix: p.Data?.StreetSuffix ?? '',
           City: p.Data?.City ?? '',
+          UnitNumber: p.Data?.UnitNumber ?? '',
           SubdivisionName: p.Data?.SubdivisionName ?? '',
           PropertySubType: p.Data?.PropertySubType ?? '',
           BCRES_SaleOrRent: p.Data?.BCRES_SaleOrRent ?? '',
@@ -164,7 +178,7 @@ export default function HomeClient() {
         setLoadingInitial(false);
       }
     },
-    [cityFromUrl]
+    [cityFromUrl, foreclosureFromUrl, filtersFromUrl]
   );
 
   useEffect(() => {

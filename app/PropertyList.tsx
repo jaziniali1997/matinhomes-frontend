@@ -6,6 +6,7 @@ import Link from 'next/link';
 
 interface Property {
   ListingKey: string;
+  UnitNumber: string;
   StreetNumber: string;
   StreetName: string;
   StreetSuffix: string;
@@ -14,6 +15,7 @@ interface Property {
   PropertySubType: string;
   BCRES_SaleOrRent: string;
   NewListing: boolean;
+  Open: boolean;
   MlsStatus: string;
   ListingId: string;
   MediaName: string;
@@ -137,12 +139,18 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
           style={{ fontFamily: 'Red Hat Display' }}
         >
           <p>
-            {p.StreetNumber} {p.StreetName} {p.StreetSuffix} in {p.City}
+            {[
+              [p.UnitNumber, p.StreetNumber, p.StreetName, p.StreetSuffix]
+                .filter(Boolean)
+                .join(' '),
+              p.SubdivisionName,
+              p.City,
+              p.PropertySubType,
+            ]
+              .filter(Boolean)
+              .join(', ')}
           </p>
-          <p>
-            {p.SubdivisionName} {p.PropertySubType} {p.BCRES_SaleOrRent} in{' '}
-            {p.SubdivisionName}: MLS®#
-          </p>
+
           {isOverflow && (
             <span className='absolute bottom-0 right-0 bg-white pl-1'>…</span>
           )}
@@ -176,27 +184,30 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
         )}
 
         <div className='absolute top-2 right-2 flex items-center gap-2 z-30'>
-          <button className='bg-[#00AD62]/50 border border-[#00AD62] text-white px-3 rounded-t-[12px] rounded-b-[16.5px] w-[55px] h-[24px] text-sm hover:bg-[#0294cc] transition backdrop-blur-[8px]'>
-            <p
-              className='text-[12px] font-semibold leading-[100%] tracking-[0]'
-              style={{ fontFamily: 'Red Hat Display' }}
-            >
-              Open
-            </p>
-          </button>
-          <button className='w-[32px] h-[24px] p-2 rounded-[4px] overflow-hidden bg-white shadow flex items-center justify-center hover:shadow-md transition'>
+          {p.Open && (
+            <button className='bg-[#00AD62]/50 border border-[#00AD62] text-white px-3 rounded-t-[12px] rounded-b-[16.5px] w-[55px] h-[24px] text-sm hover:bg-[#0294cc] transition backdrop-blur-[8px]'>
+              <p
+                className='text-[12px] font-semibold leading-[100%] tracking-[0]'
+                style={{ fontFamily: 'Red Hat Display' }}
+              >
+                Open
+              </p>
+            </button>
+          )}
+
+          {/* <button className='w-[32px] h-[24px] p-2 rounded-[4px] overflow-hidden bg-white shadow flex items-center justify-center hover:shadow-md transition'>
             <Image
               src='/Image/icons/call.svg'
               alt='icon'
               width={20}
               height={20}
             />
-          </button>
+          </button> */}
         </div>
 
-        <div className='absolute flex font-semibold leading-[100%] tracking-[0] justify-center items-center bottom-4 left-0 z-30 bg-[#005F82CC]/80 text-white px-3 rounded-tr-[16.5px] rounded-br-[16.5px] text-[12px] w-fit h-[32px] backdrop-blur-[4px]'>
+        {/* <div className='absolute flex font-semibold leading-[100%] tracking-[0] justify-center items-center bottom-4 left-0 z-30 bg-[#005F82CC]/80 text-white px-3 rounded-tr-[16.5px] rounded-br-[16.5px] text-[12px] w-fit h-[32px] backdrop-blur-[4px]'>
           {p.PropertyType}
-        </div>
+        </div> */}
         <div className='absolute font-black leading-[100%] tracking-[0] flex justify-center items-center bottom-4 right-0 z-30 bg-[#00AD6280]/50 rounded-tl-[16.5px] rounded-bl-[16.5px] text-white px-3 py-1 text-[14px] w-fit h-[32px] backdrop-blur-[4px]'>
           ${p.ListPrice?.toLocaleString()}
         </div>
@@ -256,18 +267,19 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
         </table>
       </div>
 
-      <div className='flex mt-6 justify-between items-center overflow-visible'>
+      <div className='flex mt-6  justify-between items-center overflow-visible'>
         <Link
           href={`${process.env.NEXT_PUBLIC_LISTING_URL}?ListingKey=${p.ListingKey}`}
+          className='w-full'
         >
-          <button className='bg-[#005F82] cursor-pointer rounded-[4px] px-5 py-2'>
-            <p className='leading-[28px] tracking-[0] font-medium text-white text-[14px]'>
-              Details
+          <button className='border-[#005F82] border border-1 w-full cursor-pointer rounded-[4px] px-5 py-2 hover:bg-[#B4E7FA80]/50'>
+            <p className='leading-[28px] tracking-[0] font-medium text-[#005F82] text-[14px]'>
+              View Details
             </p>
           </button>
         </Link>
 
-        <div className='relative overflow-visible' ref={menuRef}>
+        {/* <div className='relative overflow-visible' ref={menuRef}>
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -296,7 +308,7 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
               ))}
             </div>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );
