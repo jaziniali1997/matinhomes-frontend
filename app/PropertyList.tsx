@@ -91,7 +91,6 @@ export default function PropertyList({ initialData }: Props) {
 }
 
 function PropertyCard({ property: p, tableCols }: CardProps) {
-  const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const [isOverflow, setIsOverflow] = useState(false);
@@ -104,15 +103,15 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
     'Mortgage calculator',
   ];
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  // useEffect(() => {
+  //   const handleClickOutside = (event: MouseEvent) => {
+  //     if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+  //       setOpen(false);
+  //     }
+  //   };
+  //   document.addEventListener('mousedown', handleClickOutside);
+  //   return () => document.removeEventListener('mousedown', handleClickOutside);
+  // }, []);
 
   useEffect(() => {
     const el = titleRef.current;
