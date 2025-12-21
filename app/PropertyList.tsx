@@ -91,17 +91,17 @@ export default function PropertyList({ initialData }: Props) {
 }
 
 function PropertyCard({ property: p, tableCols }: CardProps) {
-  const menuRef = useRef<HTMLDivElement>(null);
+  // const menuRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const [isOverflow, setIsOverflow] = useState(false);
 
-  const menuItems = [
-    'View Photos',
-    'Schedule viewing / Email',
-    'Send listing',
-    'View on map',
-    'Mortgage calculator',
-  ];
+  // const menuItems = [
+  //   'View Photos',
+  //   'Schedule viewing / Email',
+  //   'Send listing',
+  //   'View on map',
+  //   'Mortgage calculator',
+  // ];
 
   // useEffect(() => {
   //   const handleClickOutside = (event: MouseEvent) => {
