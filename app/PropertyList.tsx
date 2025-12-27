@@ -184,7 +184,7 @@ function PropertyCard({ property: p, tableCols }: CardProps) {
 
         <div className='absolute top-2 right-2 flex items-center gap-2 z-30'>
           {p.Open && (
-            <button className='bg-[#00AD62]/50 border border-[#00AD62] text-white px-3 rounded-t-[12px] rounded-b-[16.5px] w-[55px] h-[24px] text-sm hover:bg-[#0294cc] transition backdrop-blur-[8px]'>
+            <button className='bg-[#00AD62]/50 border border-[#00AD62] text-white rounded-tr-[16.5px] rounded-br-[16.5px] rounded-bl-[12px] rounded-tl-[12px] w-[55px] h-[24px] text-sm hover:bg-[#0294cc] transition backdrop-blur-[8px]'>
               <p
                 className='text-[12px] font-semibold leading-[100%] tracking-[0]'
                 style={{ fontFamily: 'Red Hat Display' }}
