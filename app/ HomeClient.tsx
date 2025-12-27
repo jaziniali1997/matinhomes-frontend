@@ -117,7 +117,7 @@ export default function HomeClient() {
 
         if (openFromUrl !== null) queryParts.push(`open=${openFromUrl}`);
         if (officeFromUrl !== null) queryParts.push(`office=${officeFromUrl}`);
-        
+
         if (params.toString()) {
           queryParts.push(params.toString());
         }
@@ -183,7 +183,13 @@ export default function HomeClient() {
         setLoadingInitial(false);
       }
     },
-    [cityFromUrl, foreclosureFromUrl, filtersFromUrl]
+    [
+      cityFromUrl,
+      foreclosureFromUrl,
+      filtersFromUrl,
+      openFromUrl,
+      officeFromUrl,
+    ]
   );
 
   useEffect(() => {
