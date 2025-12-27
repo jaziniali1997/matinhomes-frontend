@@ -70,6 +70,8 @@ export default function HomeClient() {
   const searchParams = useSearchParams();
   const cityFromUrl = searchParams.get('city');
   const foreclosureFromUrl = searchParams.get('foreclosure');
+  const openFromUrl = searchParams.get('open');
+  const officeFromUrl = searchParams.get('office');
   const filtersFromUrl = searchParams.get('filters');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -113,6 +115,9 @@ export default function HomeClient() {
           queryParts.push(`filters=${encodeURIComponent(filtersFromUrl)}`);
         }
 
+        if (openFromUrl !== null) queryParts.push(`open=${openFromUrl}`);
+        if (officeFromUrl !== null) queryParts.push(`office=${officeFromUrl}`);
+        
         if (params.toString()) {
           queryParts.push(params.toString());
         }
